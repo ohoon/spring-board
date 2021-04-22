@@ -33,13 +33,6 @@ public class Post extends BaseEntity {
     private Member member;
 
     //== 생성자 ==//
-    private Post(String subject, String content, Member member) {
-        this.subject = subject;
-        this.content = content;
-        this.type = PostType.GENERAL;
-        this.member = member;
-    }
-
     private Post(String subject, String content, PostType type, Member member) {
         this.subject = subject;
         this.content = content;
@@ -48,20 +41,11 @@ public class Post extends BaseEntity {
     }
 
     //== 생성 메서드==//
-    public static Post create(String subject, String content, Member member) {
-        return new Post(subject, content, member);
-    }
-
     public static Post create(String subject, String content, PostType type, Member member) {
         return new Post(subject, content, type, member);
     }
 
     //== 비즈니스 로직==//
-    public void edit(String subject, String content) {
-        this.subject = subject;
-        this.content = content;
-    }
-
     public void edit(String subject, String content, PostType type) {
         this.subject = subject;
         this.content = content;
