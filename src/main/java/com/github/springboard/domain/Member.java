@@ -32,8 +32,9 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
+    @NotEmpty(message = "닉네임을 입력해주세요.")
     @Size(min = 2, max = 20)
-    @Column(length = 20)
+    @Column(nullable = false, length = 20)
     private String nickname;
 
     @NotEmpty(message = "이메일을 입력해주세요.")
