@@ -8,9 +8,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 
 @Entity
 @Getter
@@ -22,23 +19,16 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @NotEmpty(message = "아이디를 입력해주세요.")
-    @Size(min = 5, max = 20)
-    @Column(nullable = false, updatable = false, length = 20)
+    @Column(nullable = false, updatable = false)
     private String username;
 
-    @NotEmpty(message = "비밀번호를 입력해주세요.")
-    @Size(min = 8, max = 20)
     @Column(nullable = false)
     private String password;
 
-    @NotEmpty(message = "닉네임을 입력해주세요.")
-    @Size(min = 2, max = 20)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private String nickname;
 
-    @NotEmpty(message = "이메일을 입력해주세요.")
-    @Email(message = "올바른 이메일을 입력해주세요.")
+    @Column(nullable = false)
     private String email;
 
     //== 생성자 ==//
