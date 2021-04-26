@@ -28,6 +28,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .selectFrom(post)
                 .join(post.member, member).fetchJoin()
                 .where(allContains(condition))
+                .orderBy(post.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
