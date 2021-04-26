@@ -24,7 +24,7 @@ public class PostService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long post(Long memberId, String subject, String content, PostType type) {
+    public Long write(Long memberId, String subject, String content, PostType type) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundMemberException("존재하지 않는 회원입니다."));
 
@@ -33,12 +33,12 @@ public class PostService {
         return newPost.getId();
     }
 
-    public Post findOne(Long postId) {
+    public Post read(Long postId) {
         return postRepository.findWithMemberById(postId)
                 .orElseThrow(() -> new NotFoundPostException("존재하지 않는 게시물입니다."));
     }
 
-    public Page<Post> findAll(PostSearchCondition condition, Pageable pageable) {
+    public Page<Post> search(PostSearchCondition condition, Pageable pageable) {
         return postRepository.search(condition, pageable);
     }
 

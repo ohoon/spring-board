@@ -29,7 +29,7 @@ class PostServiceTest {
         Member member = Member.create("ohoon", "password", "ohoon", "ohoon@example.org");
         Long memberId = memberService.join(member);
 
-        Long postId = postService.post(
+        Long postId = postService.write(
                 memberId,
                 "testing",
                 "Sometimes, you need to mark parts of your code for future reference:" +
@@ -41,7 +41,7 @@ class PostServiceTest {
         );
 
         //when
-        Post findPost = postService.findOne(postId);
+        Post findPost = postService.read(postId);
 
         //then
         assertThat(findPost.getSubject()).isEqualTo("testing");
@@ -54,7 +54,7 @@ class PostServiceTest {
         Member member = Member.create("ohoon", "password", "ohoon", "ohoon@example.org");
         Long memberId = memberService.join(member);
 
-        Long postId = postService.post(
+        Long postId = postService.write(
                 memberId,
                 "testing",
                 "Sometimes, you need to mark parts of your code for future reference:" +
@@ -65,7 +65,7 @@ class PostServiceTest {
                 PostType.GENERAL
         );
 
-        Long postId2 = postService.post(
+        Long postId2 = postService.write(
                 memberId,
                 "testing2",
                 "Sometimes, you need to mark parts of your code for future reference:" +
@@ -76,7 +76,7 @@ class PostServiceTest {
                 PostType.GENERAL
         );
 
-        Long postId3 = postService.post(
+        Long postId3 = postService.write(
                 memberId,
                 "testing3",
                 "Sometimes, you need to mark parts of your code for future reference:" +
@@ -88,7 +88,7 @@ class PostServiceTest {
         );
 
         //when
-        Page<Post> result = postService.findAll(new PostSearchCondition(), PageRequest.of(0, 10));
+        Page<Post> result = postService.search(new PostSearchCondition(), PageRequest.of(0, 10));
 
         //then
         assertThat(result)
@@ -102,7 +102,7 @@ class PostServiceTest {
         Member member = Member.create("ohoon", "password", "ohoon", "ohoon@example.org");
         Long memberId = memberService.join(member);
 
-        Long postId = postService.post(
+        Long postId = postService.write(
                 memberId,
                 "testing",
                 "Sometimes, you need to mark parts of your code for future reference:" +
@@ -125,7 +125,7 @@ class PostServiceTest {
                 PostType.GENERAL
         );
 
-        Post findPost = postService.findOne(postId);
+        Post findPost = postService.read(postId);
 
         //then
         assertThat(findPost.getSubject()).isEqualTo("modifying!");
@@ -137,7 +137,7 @@ class PostServiceTest {
         Member member = Member.create("ohoon", "password", "ohoon", "ohoon@example.org");
         Long memberId = memberService.join(member);
 
-        Long postId = postService.post(
+        Long postId = postService.write(
                 memberId,
                 "testing",
                 "Sometimes, you need to mark parts of your code for future reference:" +
@@ -152,7 +152,7 @@ class PostServiceTest {
         postService.visit(postId);
         postService.visit(postId);
         postService.visit(postId);
-        Post findPost = postService.findOne(postId);
+        Post findPost = postService.read(postId);
 
         //then
         assertThat(findPost.getHit()).isEqualTo(3);
