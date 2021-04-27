@@ -3,6 +3,8 @@ package com.github.springboard.web;
 import com.github.springboard.domain.Member;
 import com.github.springboard.domain.MemberRole;
 import com.github.springboard.domain.Role;
+import com.github.springboard.domain.Post;
+import com.github.springboard.domain.PostType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -64,6 +66,17 @@ public class InitController {
             em.persist(memberA);
             em.persist(memberB);
             em.persist(memberC);
+
+            Post postA = Post.create("testing1", "happy day~", PostType.GENERAL, memberA);
+            Post postB = Post.create("testing2", "happy day~!", PostType.GENERAL, memberB);
+            Post postC = Post.create("testing3", "happy day~!!", PostType.GENERAL, memberB);
+            Post postD = Post.create("testing4", "happy day~!!!", PostType.GENERAL, memberA);
+            Post postE = Post.create("testing5", "happy day~!!!!", PostType.NOTICE, memberC);
+            em.persist(postA);
+            em.persist(postB);
+            em.persist(postC);
+            em.persist(postD);
+            em.persist(postE);
         }
 
     }
