@@ -1,5 +1,6 @@
 package com.github.springboard.web;
 
+import com.github.springboard.domain.Post;
 import com.github.springboard.domain.PostType;
 import com.github.springboard.dto.PostListDto;
 import com.github.springboard.dto.PostSearchCondition;
@@ -15,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
@@ -53,6 +55,14 @@ public class PostController {
         PostType type = form.getIsNotice() ? PostType.NOTICE : PostType.GENERAL;
         postService.write(1L, form.getSubject(), form.getContent(), type);
         return "redirect:/posts";
+    }
+
+    @GetMapping("/posts/{id}")
+    public String read(@PathVariable("id") Long postId, Model model) {
+        Post post = postService.read(postId);
+        postService.visit(postId);
+        model.addAttribute("post", post);
+        return "posts/read";
     }
 
 }
