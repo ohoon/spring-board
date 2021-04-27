@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Getter
@@ -17,7 +16,7 @@ public class Post extends BaseEntity {
     @Column(name = "post_id")
     private Long id;
 
-    @NotEmpty(message = "제목을 입력해주세요.")
+    @Column(nullable = false)
     private String subject;
 
     @Column(columnDefinition = "TEXT")

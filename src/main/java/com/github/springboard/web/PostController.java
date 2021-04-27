@@ -1,7 +1,9 @@
 package com.github.springboard.web;
 
+import com.github.springboard.domain.PostType;
 import com.github.springboard.dto.PostListDto;
 import com.github.springboard.dto.PostSearchCondition;
+import com.github.springboard.dto.PostWriteForm;
 import com.github.springboard.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,8 +12,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.validation.Valid;
 
 @Slf4j
 @Controller
@@ -30,6 +36,23 @@ public class PostController {
         model.addAttribute("posts", postPage.getContent());
         model.addAttribute("totalPages", postPage.getTotalPages());
         return "posts/list";
+    }
+
+    @GetMapping("/posts/write")
+    public String writeForm(Model model) {
+        model.addAttribute("writeForm", new PostWriteForm());
+        return "posts/writeForm";
+    }
+
+    @PostMapping("posts/write")
+    public String write(@Valid @ModelAttribute("writeForm") PostWriteForm form, BindingResult result) {
+        if (result.hasErrors()) {
+            return "posts/writeForm";
+        }
+
+        PostType type = form.getIsNotice() ? PostType.NOTICE : PostType.GENERAL;
+        postService.write(1L, form.getSubject(), form.getContent(), type);
+        return "redirect:/posts";
     }
 
 }
