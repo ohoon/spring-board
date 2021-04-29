@@ -1,27 +1,39 @@
 package com.github.springboard.service;
 
 import com.github.springboard.domain.Member;
+import com.github.springboard.exception.AuthenticationException;
 import com.github.springboard.exception.DuplicateMemberException;
 import com.github.springboard.exception.NotFoundMemberException;
 import com.github.springboard.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class MemberService {
+public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Transactional
-    public Long join(Member member) {
-        validateDuplicateMember(member);
+    public Long join(String username, String password, String nickname, String email) {
+        validateDuplicateUsername(username);
+        String encodePassword = passwordEncoder.encode(password);
+        Member member = Member.create(username, encodePassword, nickname, email);
         Member newMember = memberRepository.save(member);
         return newMember.getId();
     }
@@ -52,11 +64,42 @@ public class MemberService {
         findMember.changeEmail(email);
     }
 
-    private void validateDuplicateMember(Member member) {
-        List<Member> members = memberRepository.findByUsername(member.getUsername());
+    public Member login(String username, String password) {
+        List<Member> members = memberRepository.findByUsername(username);
+        if (members.isEmpty()) {
+            throw new NotFoundMemberException("존재하지 않는 회원입니다.");
+        }
+
+        Member member = members.get(0);
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new AuthenticationException("비밀번호가 일치하지 않습니다.");
+        }
+
+        return member;
+    }
+
+    private void validateDuplicateUsername(String username) {
+        List<Member> members = memberRepository.findByUsername(username);
         if (!members.isEmpty()) {
             throw new DuplicateMemberException("이미 존재하는 아이디입니다.");
         }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        List<Member> members = memberRepository.findByUsername(username);
+        if (members.isEmpty()) {
+            throw new NotFoundMemberException("존재하지 않는 회원입니다.");
+        }
+
+        Member member = members.get(0);
+        return new User(
+                member.getUsername(),
+                member.getPassword(),
+                member.getMemberRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getRole().getName()))
+                        .collect(Collectors.toList())
+        );
     }
 
 }
