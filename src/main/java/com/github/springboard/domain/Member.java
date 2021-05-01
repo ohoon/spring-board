@@ -4,10 +4,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,6 +30,13 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
+    @OneToMany(
+            mappedBy = "member",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private final List<MemberRole> memberRoles = new ArrayList<>();
+
     //== 생성자 ==//
     private Member(String username, String password, String nickname, String email) {
         this.username = username;
@@ -40,8 +46,13 @@ public class Member extends BaseEntity {
     }
 
     //== 생성 메서드 ==//
-    public static Member create(String username, String password, String nickname, String email) {
-        return new Member(username, password, nickname, email);
+    public static Member create(String username, String password, String nickname, String email, MemberRole... memberRoles) {
+        Member member = new Member(username, password, nickname, email);
+        for (MemberRole memberRole : memberRoles) {
+            member.addMemberRole(memberRole);
+        }
+
+        return member;
     }
 
     //== 비즈니스 로직 ==//
@@ -55,6 +66,11 @@ public class Member extends BaseEntity {
 
     public void changeEmail(String email) {
         this.email = email;
+    }
+
+    public void addMemberRole(MemberRole memberRole) {
+        this.getMemberRoles().add(memberRole);
+        memberRole.assignMember(this);
     }
 
 }

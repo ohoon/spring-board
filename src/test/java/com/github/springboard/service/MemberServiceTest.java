@@ -26,16 +26,16 @@ class MemberServiceTest {
 
     @BeforeEach
     void init() {
-        memberService.join(Member.create("memberA", "asd123aaaaa", "hong", "asd@a.a"));
-        memberService.join(Member.create("memberB", "123aaaaaaaa", "kang", "asdfd@asd.fd"));
-        memberService.join(Member.create("memberC", "aasdddsd23", "kim", "asdgasd@google.com"));
-        memberService.join(Member.create("memberD", "asd11111asd", "kwon", "asd@example.org"));
-        memberService.join(Member.create("memberE", "sdsdasdasdasd", "park", "a@naver.com"));
+        memberService.join("memberA", "asd123aaaaa", "hong", "asd@a.a");
+        memberService.join("memberB", "123aaaaaaaa", "kang", "asdfd@asd.fd");
+        memberService.join("memberC", "aasdddsd23", "kim", "asdgasd@google.com");
+        memberService.join("memberD", "asd11111asd", "kwon", "asd@example.org");
+        memberService.join("memberE", "sdsdasdasdasd", "park", "a@naver.com");
     }
 
     @Test
     void findOne() {
-        Long memberId = memberService.join(Member.create("testMember", "asd2333", "test", "test@naver.com"));
+        Long memberId = memberService.join("testMember", "asd2333", "test", "test@naver.com");
         Member findMember = memberService.findOne(memberId);
 
         assertThat(findMember.getId()).isEqualTo(memberId);

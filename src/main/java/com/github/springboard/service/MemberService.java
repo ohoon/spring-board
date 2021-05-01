@@ -1,10 +1,12 @@
 package com.github.springboard.service;
 
 import com.github.springboard.domain.Member;
+import com.github.springboard.exception.AuthenticationException;
 import com.github.springboard.exception.DuplicateMemberException;
 import com.github.springboard.exception.NotFoundMemberException;
 import com.github.springboard.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -19,9 +21,13 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Transactional
-    public Long join(Member member) {
-        validateDuplicateMember(member);
+    public Long join(String username, String password, String nickname, String email) {
+        validateDuplicateUsername(username);
+        String encodePassword = passwordEncoder.encode(password);
+        Member member = Member.create(username, encodePassword, nickname, email);
         Member newMember = memberRepository.save(member);
         return newMember.getId();
     }
@@ -52,8 +58,22 @@ public class MemberService {
         findMember.changeEmail(email);
     }
 
-    private void validateDuplicateMember(Member member) {
-        List<Member> members = memberRepository.findByUsername(member.getUsername());
+    public Member login(String username, String password) {
+        List<Member> members = memberRepository.findByUsername(username);
+        if (members.isEmpty()) {
+            throw new NotFoundMemberException("존재하지 않는 회원입니다.");
+        }
+
+        Member member = members.get(0);
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new AuthenticationException("비밀번호가 일치하지 않습니다.");
+        }
+
+        return member;
+    }
+
+    private void validateDuplicateUsername(String username) {
+        List<Member> members = memberRepository.findByUsername(username);
         if (!members.isEmpty()) {
             throw new DuplicateMemberException("이미 존재하는 아이디입니다.");
         }
