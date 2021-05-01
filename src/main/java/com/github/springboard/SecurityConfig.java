@@ -1,5 +1,6 @@
 package com.github.springboard;
 
+import com.github.springboard.security.MemberDetailsService;
 import com.github.springboard.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final MemberService memberService;
+    private final MemberDetailsService memberDetailsService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -43,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(memberService);
+        authenticationProvider.setUserDetailsService(memberDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder);
         return authenticationProvider;
     }
