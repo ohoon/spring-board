@@ -1,13 +1,12 @@
 package com.github.springboard.service;
 
 import com.github.springboard.domain.Member;
+import com.github.springboard.security.MemberDetails;
 import com.github.springboard.exception.AuthenticationException;
 import com.github.springboard.exception.DuplicateMemberException;
 import com.github.springboard.exception.NotFoundMemberException;
 import com.github.springboard.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,7 +17,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -93,13 +91,7 @@ public class MemberService implements UserDetailsService {
         }
 
         Member member = members.get(0);
-        return new User(
-                member.getUsername(),
-                member.getPassword(),
-                member.getMemberRoles().stream()
-                        .map(role -> new SimpleGrantedAuthority(role.getRole().getName()))
-                        .collect(Collectors.toList())
-        );
+        return new MemberDetails(member);
     }
 
 }

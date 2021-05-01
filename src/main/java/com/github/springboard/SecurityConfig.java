@@ -34,7 +34,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin(formLogin -> formLogin
                         .loginPage("/members/login")
                 )
-                .csrf(csrf -> csrf.disable());
+                .csrf(csrf -> csrf.disable())
+                .logout(logout -> logout
+                        .logoutUrl("/members/logout")
+                );
     }
 
     @Bean
