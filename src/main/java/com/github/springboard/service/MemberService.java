@@ -1,7 +1,6 @@
 package com.github.springboard.service;
 
 import com.github.springboard.domain.Member;
-import com.github.springboard.exception.AuthenticationException;
 import com.github.springboard.exception.DuplicateMemberException;
 import com.github.springboard.exception.NotFoundMemberException;
 import com.github.springboard.repository.MemberRepository;
@@ -56,20 +55,6 @@ public class MemberService {
 
         findMember.changeNickname(nickname);
         findMember.changeEmail(email);
-    }
-
-    public Member login(String username, String password) {
-        List<Member> members = memberRepository.findByUsername(username);
-        if (members.isEmpty()) {
-            throw new NotFoundMemberException("존재하지 않는 회원입니다.");
-        }
-
-        Member member = members.get(0);
-        if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new AuthenticationException("비밀번호가 일치하지 않습니다.");
-        }
-
-        return member;
     }
 
     private void validateDuplicateUsername(String username) {

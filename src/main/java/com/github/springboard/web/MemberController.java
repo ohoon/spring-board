@@ -2,7 +2,6 @@ package com.github.springboard.web;
 
 import com.github.springboard.dto.MemberLoginForm;
 import com.github.springboard.dto.MemberSignUpForm;
-import com.github.springboard.exception.AuthenticationException;
 import com.github.springboard.exception.DuplicateMemberException;
 import com.github.springboard.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -45,20 +44,6 @@ public class MemberController {
     public String loginForm(Model model) {
         model.addAttribute("loginForm", new MemberLoginForm());
         return "members/loginForm";
-    }
-
-    @PostMapping("/members/login")
-    public String login(@Valid @ModelAttribute("loginForm") MemberLoginForm form, BindingResult result) {
-        try {
-            if (result.hasErrors()) {
-                return "members/loginForm";
-            }
-
-            memberService.login(form.getUsername(), form.getPassword());
-            return "redirect:/";
-        } catch (AuthenticationException e) {
-            return "members/loginForm";
-        }
     }
 
 }
