@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,12 +41,14 @@ public class PostController {
         return "posts/list";
     }
 
+    @PreAuthorize("hasRole('MEMBER')")
     @GetMapping("/posts/write")
     public String writeForm(Model model) {
         model.addAttribute("writeForm", new PostWriteForm());
         return "posts/writeForm";
     }
 
+    @PreAuthorize("hasRole('MEMBER')")
     @PostMapping("posts/write")
     public String write(@Valid @ModelAttribute("writeForm") PostWriteForm form, BindingResult result) {
         if (result.hasErrors()) {
