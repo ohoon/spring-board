@@ -32,8 +32,8 @@
       <tr th:each="post : ${posts}">
         <td th:if="${post.type.name() == 'NOTICE'}"><small th:text="공지"></small></td>
         <td th:unless="${post.type.name() == 'NOTICE'}"><small th:text="${post.id}"></small></td>
-        <td th:if="${post.type.name() == 'NOTICE'}" style="text-align: left"><a th:href="|/posts/${post.id}|"><strong th:text="${post.subject}"></strong></a></td>
-        <td th:unless="${post.type.name() == 'NOTICE'}" style="text-align: left"><a th:href="|/posts/${post.id}|" th:text="${post.subject}"></a></td>
+        <td th:if="${post.type.name() == 'NOTICE'}" style="text-align: left"><a th:href="|@{/posts/{id}(id=${post.id})}|"><strong th:text="${post.subject}"></strong></a></td>
+        <td th:unless="${post.type.name() == 'NOTICE'}" style="text-align: left"><a th:href="|@{/posts/{id}(id=${post.id})}|" th:text="${post.subject}"></a></td>
         <td th:text="${post.nickname}"></td>
         <td th:if="${post.createdDate.isAfter(post.createdDate.now().minusDays(1))}">
           <small th:text="${#temporals.format(post.createdDate, 'HH:mm')}"></small>
