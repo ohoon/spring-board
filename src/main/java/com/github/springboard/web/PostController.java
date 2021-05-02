@@ -1,10 +1,12 @@
 package com.github.springboard.web;
 
+import com.github.springboard.domain.Member;
 import com.github.springboard.domain.Post;
 import com.github.springboard.domain.PostType;
 import com.github.springboard.dto.PostListDto;
 import com.github.springboard.dto.PostSearchCondition;
 import com.github.springboard.dto.PostWriteForm;
+import com.github.springboard.security.CurrentMember;
 import com.github.springboard.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,13 +52,17 @@ public class PostController {
 
     @PreAuthorize("hasRole('MEMBER')")
     @PostMapping("posts/write")
-    public String write(@Valid @ModelAttribute("writeForm") PostWriteForm form, BindingResult result) {
+    public String write(
+            @CurrentMember Member member,
+            @Valid @ModelAttribute("writeForm") PostWriteForm form,
+            BindingResult result
+    ) {
         if (result.hasErrors()) {
             return "posts/writeForm";
         }
 
         PostType type = form.getIsNotice() ? PostType.NOTICE : PostType.GENERAL;
-        postService.write(1L, form.getSubject(), form.getContent(), type);
+        postService.write(member.getId(), form.getSubject(), form.getContent(), type);
         return "redirect:/posts";
     }
 
