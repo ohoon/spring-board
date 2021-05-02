@@ -32,6 +32,11 @@
       </div>
       <div class="col">
         <div class="float-right">
+          <form th:action="|@{/posts/{id}/remove(id=${post.id})}|" method="post"
+                th:if="${post.member.username == currentMemberUsername}"
+                style="display: inline">
+            <button class="btn btn-danger" type="submit">글삭제</button>
+          </form>
           <button class="btn btn-info" type="button"
                   th:if="${post.member.username == currentMemberUsername}"
                   th:onclick="|location.href='@{/posts/{id}/edit(id=${post.id})}'|">글수정</button>

@@ -27,6 +27,8 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PostType type;
 
+    private boolean isRemoved;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -49,6 +51,10 @@ public class Post extends BaseEntity {
         this.subject = subject;
         this.content = content;
         this.type = type;
+    }
+
+    public void remove() {
+        this.isRemoved = true;
     }
 
     public void visit() {

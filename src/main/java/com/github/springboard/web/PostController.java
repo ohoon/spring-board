@@ -111,5 +111,12 @@ public class PostController {
         return "redirect:/posts/{id}";
     }
 
+    @PreAuthorize("@postService.isWriter(#postId, authentication.name)")
+    @PostMapping("/posts/{id}/remove")
+    public String remove(@PathVariable("id") Long postId) {
+        postService.remove(postId);
+        return "redirect:/posts";
+    }
+
 
 }

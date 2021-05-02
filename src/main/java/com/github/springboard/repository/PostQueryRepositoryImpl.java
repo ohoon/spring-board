@@ -27,7 +27,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         List<Post> content = queryFactory
                 .selectFrom(post)
                 .join(post.member, member).fetchJoin()
-                .where(allContains(condition))
+                .where(allContains(condition).and(post.isRemoved.isFalse()))
                 .orderBy(post.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -35,7 +35,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         JPAQuery<Post> countQuery = queryFactory
                 .selectFrom(post)
-                .where(allContains(condition));
+                .where(allContains(condition).and(post.isRemoved.isFalse()));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
     }

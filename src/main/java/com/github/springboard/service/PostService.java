@@ -51,6 +51,14 @@ public class PostService {
     }
 
     @Transactional
+    public void remove(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundPostException("존재하지 않는 게시물입니다."));
+
+        post.remove();
+    }
+
+    @Transactional
     public void visit(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundPostException("존재하지 않는 게시물입니다."));
