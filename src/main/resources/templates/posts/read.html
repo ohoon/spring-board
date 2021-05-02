@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/header :: header"></head>
+<body>
+  <div class="container">
+    <div class="py-3 text-center">
+      <h3>게시판</h3>
+    </div>
+    <hr />
+    <div>
+      <p><strong th:text="${post.subject}"></strong></p>
+    </div>
+    <div>
+      <div style="display: inline-block">
+        <small th:text="${post.member.nickname}"></small>
+      </div>
+      <div style="display: inline-block; float:right">
+        <div style="display: inline-block; padding-inline-end: 0.5rem">
+          <small th:text="|조회수 ${post.hit}|"></small>
+        </div>
+        <div style="display: inline-block; padding-inline-start: 0.5rem">
+          <small th:text="|작성일 ${#temporals.format(post.createdDate, 'yyyy-MM-dd HH:mm:ss')}|"></small>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <div th:text="${post.content}"></div>
+    <hr />
+    <div class="row">
+      <div class="col">
+        <button class="btn btn-dark" type="button" th:onclick="|location.href='@{/posts}'|">전체글</button>
+      </div>
+      <div class="col">
+        <div class="float-right">
+          <form th:action="|@{/posts/{id}/remove(id=${post.id})}|" method="post"
+                th:if="${post.member.username == currentMemberUsername}"
+                style="display: inline">
+            <button class="btn btn-danger" type="submit">글삭제</button>
+          </form>
+          <button class="btn btn-info" type="button"
+                  th:if="${post.member.username == currentMemberUsername}"
+                  th:onclick="|location.href='@{/posts/{id}/edit(id=${post.id})}'|">글수정</button>
+          <button class="btn btn-dark" type="button" th:onclick="|location.href='@{/posts/write}'|">글쓰기</button>
+        </div>
+      </div>
+    </div>
+    <div th:replace="/fragments/footer :: footer"></div>
+  </div>
+</body>
+</html>
