@@ -58,4 +58,11 @@ public class PostService {
         post.visit();
     }
 
+    public boolean isWriter(Long postId, String username) {
+        Post post = postRepository.findWithMemberById(postId)
+                .orElseThrow(() -> new NotFoundPostException("존재하지 않는 게시물입니다."));
+
+        return post.getMember().getUsername().equals(username);
+    }
+
 }

@@ -29,7 +29,14 @@
     <div class="row">
       <div class="col">
         <button class="btn btn-dark" type="button" th:onclick="|location.href='@{/posts}'|">전체글</button>
-        <button class="btn btn-dark float-right" type="button" th:onclick="|location.href='@{/posts/write}'|">글쓰기</button>
+      </div>
+      <div class="col">
+        <div class="float-right">
+          <button class="btn btn-info" type="button"
+                  th:if="${post.member.username == currentMemberUsername}"
+                  th:onclick="|location.href='@{/posts/{id}/edit(id=${post.id})}'|">글수정</button>
+          <button class="btn btn-dark" type="button" th:onclick="|location.href='@{/posts/write}'|">글쓰기</button>
+        </div>
       </div>
     </div>
     <div th:replace="/fragments/footer :: footer"></div>

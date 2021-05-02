@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
@@ -67,11 +68,48 @@ public class PostController {
     }
 
     @GetMapping("/posts/{id}")
-    public String read(@PathVariable("id") Long postId, Model model) {
+    public String read(
+            @CurrentMember Member member,
+            @PathVariable("id") Long postId,
+            Model model
+    ) {
         Post post = postService.read(postId);
         postService.visit(postId);
+        model.addAttribute("currentMemberUsername", member != null ? member.getUsername() : null);
         model.addAttribute("post", post);
         return "posts/read";
     }
+
+    @PreAuthorize("@postService.isWriter(#postId, authentication.name)")
+    @GetMapping("/posts/{id}/edit")
+    public String editForm(@PathVariable("id") Long postId, Model model) {
+        Post post = postService.read(postId);
+        model.addAttribute("editForm", new PostWriteForm(post));
+        return "posts/editForm";
+    }
+
+    @PreAuthorize("@postService.isWriter(#postId, authentication.name)")
+    @PostMapping("/posts/{id}/edit")
+    public String edit(
+            @PathVariable("id") Long postId,
+            @Valid @ModelAttribute("editForm") PostWriteForm form,
+            BindingResult result,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (result.hasErrors()) {
+            return "posts/editForm";
+        }
+
+        postService.edit(
+                postId,
+                form.getSubject(),
+                form.getContent(),
+                form.getIsNotice() ? PostType.NOTICE : PostType.GENERAL
+        );
+
+        redirectAttributes.addAttribute("id", postId);
+        return "redirect:/posts/{id}";
+    }
+
 
 }
