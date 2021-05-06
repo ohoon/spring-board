@@ -11,4 +11,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostQueryRepo
     @EntityGraph(attributePaths = {"member"})
     Optional<Post> findWithMemberById(Long id);
 
+    @EntityGraph(attributePaths = {"votes"})
+    Optional<Post> findWithVotesById(Long id);
+
 }
