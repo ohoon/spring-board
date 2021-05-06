@@ -6,7 +6,8 @@ public class DuplicateMemberException extends RuntimeException {
         super();
     }
 
-    public DuplicateMemberException(String s) {
+    public DuplicateMemberException(String message) {
+        super(message);
     }
 
     public DuplicateMemberException(String message, Throwable cause) {
