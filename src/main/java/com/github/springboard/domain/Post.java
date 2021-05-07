@@ -76,13 +76,11 @@ public class Post extends BaseEntity {
         this.hit++;
     }
 
-    public void addVote(Vote vote) {
+    public void vote(Vote vote) {
         this.getVotes().add(vote);
         vote.assignPost(this);
-    }
 
-    public void vote(boolean isLike) {
-        if (isLike) {
+        if (vote.isLike()) {
             this.like++;
         } else {
             this.hate++;

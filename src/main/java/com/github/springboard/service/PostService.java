@@ -69,7 +69,7 @@ public class PostService {
     }
 
     @Transactional
-    public void vote(Long memberId, Long postId, boolean isLike) {
+    public int vote(Long memberId, Long postId, boolean isLike) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundMemberException("존재하지 않는 회원입니다."));
 
@@ -77,13 +77,12 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundPostException("존재하지 않는 게시물입니다."));
 
         Vote vote = Vote.create(member, isLike);
-
         if (post.getVotes().stream().anyMatch(v -> v.getMember().getId().equals(memberId))) {
             throw new DuplicateVoteException("하나의 게시물에는 한 번만 투표할 수 있습니다.");
         }
 
-        post.addVote(vote);
-        post.vote(isLike);
+        post.vote(vote);
+        return isLike ? post.getLike() : post.getHate();
     }
 
     public boolean isWriter(Long postId, String username) {
