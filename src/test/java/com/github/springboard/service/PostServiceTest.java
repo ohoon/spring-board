@@ -26,8 +26,8 @@ class PostServiceTest {
     @Test
     void findOne() {
         //given
-        Member member = Member.create("ohoon", "password", "ohoon", "ohoon@example.org");
-        Long memberId = memberService.join(member);
+        Long memberId = memberService.join("ohoon", "password", "ohoon", "ohoon@example.org");
+        Member member = memberService.findOne(memberId);
 
         Long postId = postService.write(
                 memberId,
@@ -51,8 +51,8 @@ class PostServiceTest {
     @Test
     void findAll() {
         //given
-        Member member = Member.create("ohoon", "password", "ohoon", "ohoon@example.org");
-        Long memberId = memberService.join(member);
+        Long memberId = memberService.join("ohoon", "password", "ohoon", "ohoon@example.org");
+        Member member = memberService.findOne(memberId);
 
         Long postId = postService.write(
                 memberId,
@@ -93,14 +93,14 @@ class PostServiceTest {
         //then
         assertThat(result)
                 .extracting("subject")
-                .containsExactly("testing", "testing2", "testing3");
+                .containsExactly("testing3", "testing2", "testing");
     }
 
     @Test
     void edit() {
         //given
-        Member member = Member.create("ohoon", "password", "ohoon", "ohoon@example.org");
-        Long memberId = memberService.join(member);
+        Long memberId = memberService.join("ohoon", "password", "ohoon", "ohoon@example.org");
+        Member member = memberService.findOne(memberId);
 
         Long postId = postService.write(
                 memberId,
@@ -134,8 +134,8 @@ class PostServiceTest {
     @Test
     void visit() {
         //given
-        Member member = Member.create("ohoon", "password", "ohoon", "ohoon@example.org");
-        Long memberId = memberService.join(member);
+        Long memberId = memberService.join("ohoon", "password", "ohoon", "ohoon@example.org");
+        Member member = memberService.findOne(memberId);
 
         Long postId = postService.write(
                 memberId,

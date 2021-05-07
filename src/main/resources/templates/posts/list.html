@@ -22,10 +22,11 @@
       <thead>
       <tr>
         <th scope="col" style="width: 7%">번호</th>
-        <th scope="col" style="width: 60%">제목</th>
-        <th scope="col" style="width: 15%">작성자</th>
+        <th scope="col" style="width: 54%">제목</th>
+        <th scope="col" style="width: 13%">작성자</th>
         <th scope="col" style="width: 10%">작성일</th>
         <th scope="col" style="width: 8%">조회</th>
+        <th scope="col" style="width: 8%">추천</th>
       </tr>
       </thead>
       <tbody>
@@ -46,6 +47,7 @@
           <small th:text="${#temporals.format(post.createdDate, 'yyyy/MM/dd')}"></small>
         </td>
         <td><small th:text="${post.hit}"></small></td>
+        <td><small th:text="${post.like}"></small></td>
       </tr>
       <tr th:if="${posts.isEmpty()}">
         <td colspan="5" class="text-center">게시물이 없습니다.</td>
@@ -53,6 +55,9 @@
       </tbody>
     </table>
     <div class="row">
+      <div class="col">
+        <button class="btn btn-dark" type="button" th:onclick="|location.href='@{/posts}'|">전체글</button>
+      </div>
       <div class="col">
         <button class="btn btn-dark float-right" type="button" th:onclick="|location.href='@{/posts/write}'|">글쓰기</button>
       </div>

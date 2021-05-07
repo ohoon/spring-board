@@ -21,6 +21,8 @@ public class PostListDto {
 
     private int hit;
 
+    private int like;
+
     //== 생성자 ==//
     public PostListDto(Post post) {
         this.id = post.getId();
@@ -29,6 +31,7 @@ public class PostListDto {
         this.nickname = post.getMember().getNickname();
         this.createdDate = post.getCreatedDate();
         this.hit = post.getHit();
+        this.like = post.getLike();
     }
 
 }

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,6 +25,19 @@ public class Post extends BaseEntity {
     private String content;
 
     private int hit;
+
+    @OneToMany(
+            mappedBy = "post",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private final List<Vote> votes = new ArrayList<>();
+
+    @Column(name = "likes")
+    private int like;
+
+    @Column(name = "hates")
+    private int hate;
 
     @Enumerated(EnumType.STRING)
     private PostType type;
@@ -59,6 +74,17 @@ public class Post extends BaseEntity {
 
     public void visit() {
         this.hit++;
+    }
+
+    public void vote(Vote vote) {
+        this.getVotes().add(vote);
+        vote.assignPost(this);
+
+        if (vote.isLike()) {
+            this.like++;
+        } else {
+            this.hate++;
+        }
     }
 
 }
