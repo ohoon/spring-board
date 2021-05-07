@@ -9,7 +9,6 @@ import com.github.springboard.dto.PostWriteForm;
 import com.github.springboard.security.CurrentMember;
 import com.github.springboard.service.PostService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -25,7 +24,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
-@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class PostController {
@@ -38,7 +36,8 @@ public class PostController {
             @PageableDefault Pageable pageable,
             Model model
     ) {
-        Page<PostListDto> postPage = postService.search(condition, pageable).map(PostListDto::new);
+        Page<Post> posts = postService.search(condition, pageable);
+        Page<PostListDto> postPage = posts.map(PostListDto::new);
         model.addAttribute("posts", postPage.getContent());
         model.addAttribute("totalPages", postPage.getTotalPages());
         return "posts/list";
@@ -75,6 +74,7 @@ public class PostController {
     ) {
         Post post = postService.read(postId);
         postService.visit(postId);
+        model.addAttribute("currentMemberId", member != null ? member.getId() : null);
         model.addAttribute("currentMemberUsername", member != null ? member.getUsername() : null);
         model.addAttribute("post", post);
         return "posts/read";

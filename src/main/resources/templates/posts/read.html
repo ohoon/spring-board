@@ -25,6 +25,12 @@
     </div>
     <hr />
     <div th:utext="${post.content}"></div>
+    <div class="text-center">
+      <button class="btn btn-secondary" type="button" id="like" th:text="|추천 ${post.like}|"
+              th:onclick="|vote(${currentMemberId}, ${post.id}, ${true})|"></button>
+      <button class="btn btn-danger" type="button" id="hate" th:text="|비추천 ${post.hate}|"
+              th:onclick="|vote(${currentMemberId}, ${post.id}, ${false})|"></button>
+    </div>
     <hr />
     <div class="row">
       <div class="col">
@@ -46,5 +52,36 @@
     </div>
     <div th:replace="/fragments/footer :: footer"></div>
   </div>
+  <script>
+    function vote(memberId, postId, isLike) {
+      const postVoteDto = {
+        memberId: memberId,
+        postId: postId,
+        isLike: isLike
+      };
+
+      $.ajax({
+        type:"POST",
+        url: "/api/posts/vote",
+        data: JSON.stringify(postVoteDto),
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+      })
+              .done(result => {
+                if (!result['success']) {
+                  return alert(result['message']);
+                }
+
+                if (isLike) {
+                  $('#like').html('추천 ' + result['data']);
+                } else {
+                  $('#hate').html('비추천 ' + result['data']);
+                }
+              })
+              .fail(() => {
+                return alert('로그인이 필요합니다.');
+              });
+    }
+  </script>
 </body>
 </html>
