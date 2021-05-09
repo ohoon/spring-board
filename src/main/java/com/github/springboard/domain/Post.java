@@ -24,6 +24,9 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @OneToMany(mappedBy = "post")
+    private final List<Comment> comments = new ArrayList<>();
+
     private int hit;
 
     @OneToMany(
