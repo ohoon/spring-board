@@ -32,6 +32,19 @@
               th:onclick="|vote(${currentMemberId}, ${post.id}, ${false})|"></button>
     </div>
     <hr />
+    <div class="row mb-4">
+      <div class="col">
+        <strong>전체 댓글 <span class="text-danger" id="comment_count"></span>개</strong>
+      </div>
+    </div>
+    <div id="comment_list" th:on="|readComments(${post.id}, 0)|"></div>
+    <div class="input-group mb-5">
+      <textarea class="form-control" style="resize: none" id="comment_input"></textarea>
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" id="comment_write" type="button"
+                th:onclick="|writeComment(${currentMemberId}, ${post.id})|">작성</button>
+      </div>
+    </div>
     <div class="row">
       <div class="col">
         <button class="btn btn-dark" type="button" th:onclick="|location.href='@{/posts}'|">전체글</button>
@@ -52,7 +65,14 @@
     </div>
     <div th:replace="/fragments/footer :: footer"></div>
   </div>
-  <script>
+  <script th:inline="javascript">
+    $(document).ready(() => {
+      /*<![CDATA[*/
+      const postId = "[[${post.id}]]";
+      /*]]>*/
+      readComments(postId, 0);
+    });
+
     function vote(memberId, postId, isLike) {
       const postVoteDto = {
         memberId: memberId,
@@ -77,6 +97,71 @@
                 } else {
                   $('#hate').html('비추천 ' + result['data']);
                 }
+              })
+              .fail(() => {
+                return alert('로그인이 필요합니다.');
+              });
+    }
+
+    function readComments(postId, page) {
+      const list = $('#comment_list');
+      const count = $('#comment_count');
+
+      $.ajax({
+        type:"GET",
+        url: "/api/posts/" + postId + "/comments?page=" + page,
+      })
+              .done(result => {
+                if (!result['success']) {
+                  return alert(result['message']);
+                }
+
+                let html = "";
+                $.each(result['data']['content'], (id, comment) => {
+                  html += '<div class="row">';
+                  html += '  <div class="col">';
+                  html += '    <div style="padding-inline: 0.5rem">';
+                  html += '      <small><strong>' + comment['nickname'] + '</strong></small>';
+                  html += '     <small class="text-muted float-right">' + moment(comment['createdDate']).format(`YYYY-MM-DD HH:mm:ss`) + '</small>';
+                  html += '    </div>';
+                  html += '    <div style="padding: 0.5rem">';
+                  html += '      <span>' + comment['content'] + '</span>';
+                  html += '    </div>';
+                  html += '  </div>';
+                  html += '</div>';
+                  html += '<hr/>';
+                })
+                list.html(html);
+                count.html(result['data']['content']['length']);
+              })
+              .fail(() => {
+                return alert('댓글을 불러오지 못하였습니다.');
+              });
+    }
+
+    function writeComment(memberId, postId) {
+      const input = $('#comment_input');
+
+      const postCommentWriteDto = {
+        memberId: memberId,
+        content: input.val()
+      };
+
+      $.ajax({
+        type:"POST",
+        url: "/api/posts/" + postId + "/comments",
+        data: JSON.stringify(postCommentWriteDto),
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+      })
+              .done(result => {
+                if (!result['success']) {
+                  return alert(result['message']);
+                }
+
+                readComments(postId, 0);
+                input.val("");
+                input.focus();
               })
               .fail(() => {
                 return alert('로그인이 필요합니다.');
