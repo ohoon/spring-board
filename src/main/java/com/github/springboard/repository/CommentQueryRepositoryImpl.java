@@ -11,6 +11,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 import java.util.List;
 
 import static com.github.springboard.domain.QComment.comment;
+import static com.github.springboard.domain.QMember.member;
 
 @RequiredArgsConstructor
 public class CommentQueryRepositoryImpl implements CommentQueryRepository {
@@ -21,6 +22,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
     public Page<Comment> list(Long postId, Pageable pageable) {
         List<Comment> content = queryFactory
                 .selectFrom(comment)
+                .leftJoin(comment.member, member).fetchJoin()
                 .where(comment.post.id.eq(postId))
                 .orderBy(comment.id.asc())
                 .offset(pageable.getOffset())
