@@ -1,6 +1,7 @@
 package com.github.springboard.repository;
 
 import com.github.springboard.domain.Post;
+import com.github.springboard.domain.QComment;
 import com.github.springboard.dto.PostSearchCondition;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -12,6 +13,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 
+import static com.github.springboard.domain.QComment.comment;
 import static com.github.springboard.domain.QMember.member;
 import static com.github.springboard.domain.QPost.post;
 import static com.github.springboard.util.NullSafeBuilder.nullSafeBuilder;
@@ -26,7 +28,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     public Page<Post> search(PostSearchCondition condition, Pageable pageable) {
         List<Post> content = queryFactory
                 .selectFrom(post)
-                .join(post.member, member).fetchJoin()
+                .leftJoin(post.member, member).fetchJoin()
+                .leftJoin(post.comments, comment).fetchJoin()
                 .where(allContains(condition).and(post.isRemoved.isFalse()))
                 .orderBy(post.id.desc())
                 .offset(pageable.getOffset())

@@ -15,6 +15,8 @@ public class PostListDto {
 
     private String subject;
 
+    private int commentCount;
+
     private String nickname;
 
     private LocalDateTime createdDate;
@@ -28,6 +30,7 @@ public class PostListDto {
         this.id = post.getId();
         this.type = post.getType();
         this.subject = post.getSubject();
+        this.commentCount = post.getComments().size();
         this.nickname = post.getMember().getNickname();
         this.createdDate = post.getCreatedDate();
         this.hit = post.getHit();
