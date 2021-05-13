@@ -38,7 +38,7 @@
       </div>
     </div>
     <div id="comment_list" th:on="|readComments(${post.id}, 0)|"></div>
-    <div class="input-group mb-5">
+    <div class="input-group mb-5" id="comment_write_box">
       <textarea class="form-control" style="resize: none" id="comment_input"></textarea>
       <div class="input-group-append">
         <button class="btn btn-outline-secondary" id="comment_write" type="button"
@@ -72,6 +72,13 @@
       /*]]>*/
       readComments(postId, 0);
     });
+
+    $(document).on('keypress', 'textarea', e => {
+        if (e.keyCode === 13 && !e.shiftKey) {
+            $('#comment_write').click();
+            return false;
+        }
+    })
 
     function vote(memberId, postId, isLike) {
       const postVoteDto = {
