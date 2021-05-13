@@ -1,12 +1,9 @@
 package com.github.springboard.api;
 
-import com.github.springboard.dto.PostCommentDto;
-import com.github.springboard.dto.PostCommentWriteDto;
-import com.github.springboard.dto.Result;
-import com.github.springboard.dto.PostVoteDto;
-import com.github.springboard.exception.DuplicateVoteException;
-import com.github.springboard.exception.NotFoundMemberException;
-import com.github.springboard.exception.NotFoundPostException;
+import com.github.springboard.domain.Member;
+import com.github.springboard.dto.*;
+import com.github.springboard.exception.*;
+import com.github.springboard.security.CurrentMember;
 import com.github.springboard.service.CommentService;
 import com.github.springboard.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -70,6 +67,32 @@ public class PostApiController {
             result.setData(commentId);
             result.setMessage("정상적으로 등록되었습니다.");
         } catch (NotFoundMemberException | NotFoundPostException e) {
+            result.setSuccess(false);
+            result.setData(null);
+            result.setMessage(e.getMessage());
+        }
+
+        return result;
+    }
+
+    @PostMapping("/api/posts/{id}/comments/{cid}")
+    public Result<Long> removeComment(
+            @CurrentMember Member member,
+            @PathVariable("id") Long postId,
+            @PathVariable("cid") Long commentId,
+            @Valid @RequestBody MemberSimpleAuthDto simpleAuthDto
+    ) {
+        Result<Long> result = new Result<>();
+
+        try {
+            if (!simpleAuthDto.getMemberId().equals(member.getId())) {
+                throw new AuthenticationException("댓글을 삭제할 권한이 없습니다.");
+            }
+            commentService.remove(commentId);
+            result.setSuccess(true);
+            result.setData(commentId);
+            result.setMessage("정상적으로 삭제되었습니다.");
+        } catch (AuthenticationException | NotFoundCommentException e) {
             result.setSuccess(false);
             result.setData(null);
             result.setMessage(e.getMessage());

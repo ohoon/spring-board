@@ -12,16 +12,22 @@ public class PostCommentDto {
 
     private String content;
 
+    private String username;
+
     private String nickname;
 
     private LocalDateTime createdDate;
+
+    private boolean isRemoved;
 
     //== 생성자 ==//
     public PostCommentDto(Comment comment) {
         this.id = comment.getId();
         this.content = comment.getContent();
+        this.username = comment.getMember().getUsername();
         this.nickname = comment.getMember().getNickname();
         this.createdDate = comment.getCreatedDate();
+        this.isRemoved = comment.isRemoved();
     }
 
 }
