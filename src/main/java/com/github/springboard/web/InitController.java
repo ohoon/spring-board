@@ -88,6 +88,18 @@ public class InitController {
             em.persist(commentC);
             em.persist(commentD);
             em.persist(commentE);
+
+            Comment replyA = Comment.create("Sometimes, you need to mark parts of your code for future reference:", postA, memberA);
+            Comment replyB = Comment.create("Sometimes, you need to mark parts of your code for future reference:" +
+                    " areas of optimization and improvement, possible changes, questions to be discussed, and so on.", postA, memberC);
+            Comment replyC = Comment.create(" areas of optimization and improvement, possible changes," +
+                    " questions to be discussed, and so on.", postA, memberB);
+            replyA.assignParent(commentA);
+            replyB.assignParent(commentA);
+            replyC.assignParent(commentB);
+            em.persist(replyA);
+            em.persist(replyB);
+            em.persist(replyC);
         }
 
     }
