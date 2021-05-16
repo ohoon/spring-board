@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,6 +30,13 @@ public class Comment extends BaseEntity {
 
     private boolean isRemoved;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent")
+    private final List<Comment> children = new ArrayList<>();
+
     //== 생성자 ==//
     private Comment(String content, Post post, Member member) {
         this.content = content;
@@ -47,6 +56,11 @@ public class Comment extends BaseEntity {
 
     public void remove() {
         this.isRemoved = true;
+    }
+
+    public void assignParent(Comment parent) {
+        this.parent = parent;
+        parent.getChildren().add(this);
     }
 
 }
