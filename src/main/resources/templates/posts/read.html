@@ -74,12 +74,37 @@
       readComments(0);
     });
 
-    $(document).on('keypress', 'textarea', e => {
-        if (e.keyCode === 13 && !e.shiftKey) {
-            $('#comment_write').click();
-            return false;
-        }
-    })
+    $(document).on('keypress', '#comment_input', e => {
+      if (e.keyCode === 13 && !e.shiftKey) {
+        $('#comment_write').click();
+        return false;
+      }
+    });
+
+    $(document).on('keypress', '#reply_input', e => {
+      if (e.keyCode === 13 && !e.shiftKey) {
+        $('#reply_write').click();
+        return false;
+      }
+    });
+
+    $(document).on('click', '#comment', e => {
+      if ($(e.currentTarget).parent().find('#reply_write_box').length > 0) {
+        $(e.currentTarget).parent().find('#reply_write_box').remove();
+        return;
+      }
+
+      $(document).find('#reply_write_box').remove();
+      $(e.currentTarget).parent().append(
+              `<div class="input-group mt-4" id="reply_write_box">
+                 <input id="parent_id" type="hidden" value="${$(e.currentTarget).attr('data-id')}">
+                 <textarea class="form-control" style="resize: none" id="reply_input"></textarea>
+                 <div class="input-group-append">
+                   <button class="btn btn-outline-secondary" id="reply_write" type="button" onclick="writeReply()">작성</button>
+                 </div>
+               </div>`
+      );
+    });
 
     function vote(isLike) {
       const postVoteDto = {
@@ -87,6 +112,11 @@
         postId: postId,
         isLike: isLike
       };
+
+      if (memberId == null) {
+        alert("로그인이 필요한 서비스입니다.");
+        return false;
+      }
 
       $.ajax({
         type:"POST",
@@ -107,7 +137,7 @@
                 }
               })
               .fail(() => {
-                return alert('로그인이 필요합니다.');
+                return alert('예상치 못한 에러가 발생하였습니다.');
               });
     }
 
@@ -185,8 +215,19 @@
 
       const postCommentWriteDto = {
         memberId: memberId,
-        content: input.val()
+        content: input.val(),
+        parentId: null
       };
+
+      if (memberId == null) {
+        alert("로그인이 필요한 서비스입니다.");
+        return false;
+      }
+
+      if (!input.val()) {
+        alert("내용을 입력해주세요.");
+        return false;
+      }
 
       $.ajax({
         type:"POST",
@@ -205,33 +246,79 @@
                 input.focus();
               })
               .fail(() => {
-                return alert('로그인이 필요합니다.');
+                return alert('예상치 못한 에러가 발생하였습니다.');
               });
     }
 
     function removeComment(commentId) {
-        const memberSimpleAuthDto = {
-            memberId: memberId
-        };
+      const memberSimpleAuthDto = {
+          memberId: memberId
+      };
 
-        $.ajax({
-            type:"POST",
-            url: "/api/posts/" + postId + "/comments/" + commentId,
-            data: JSON.stringify(memberSimpleAuthDto),
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
-        })
-            .done(result => {
+      if (memberId == null) {
+        alert("로그인이 필요한 서비스입니다.");
+        return false;
+      }
+
+      $.ajax({
+          type:"POST",
+          url: "/api/posts/" + postId + "/comments/" + commentId,
+          data: JSON.stringify(memberSimpleAuthDto),
+          dataType: "json",
+          contentType: "application/json; charset=utf-8",
+      })
+          .done(result => {
+              if (!result['success']) {
+                  return alert(result['message']);
+              }
+
+              readComments(0);
+              alert("정상적으로 삭제되었습니다.");
+          })
+          .fail(() => {
+              return alert('예상치 못한 에러가 발생하였습니다.');
+          });
+    }
+
+    function writeReply() {
+      const input = $('#reply_input');
+      const parentId = $('#parent_id');
+
+      const postCommentWriteDto = {
+        memberId: memberId,
+        content: input.val(),
+        parentId: parentId.val()
+      };
+
+      if (memberId == null) {
+        alert("로그인이 필요한 서비스입니다.");
+        return false;
+      }
+
+      if (!input.val()) {
+        alert("내용을 입력해주세요.");
+        return false;
+      }
+
+      $.ajax({
+        type:"POST",
+        url: "/api/posts/" + postId + "/comments",
+        data: JSON.stringify(postCommentWriteDto),
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+      })
+              .done(result => {
                 if (!result['success']) {
-                    return alert(result['message']);
+                  return alert(result['message']);
                 }
 
                 readComments(0);
-                alert("정상적으로 삭제되었습니다.");
-            })
-            .fail(() => {
-                return alert('로그인이 필요합니다.');
-            });
+                input.val("");
+                input.focus();
+              })
+              .fail(() => {
+                return alert('예상치 못한 에러가 발생하였습니다.');
+              });
     }
   </script>
 </body>

@@ -44,7 +44,7 @@ class CommentServiceTest {
                 PostType.GENERAL
         );
 
-        commentService.write(memberId, postId, "test comment!");
+        commentService.write(memberId, postId, "test comment!", null);
         Page<Comment> result = commentService.list(postId, PageRequest.of(0, 10));
 
         assertThat(result)
@@ -67,7 +67,7 @@ class CommentServiceTest {
                 PostType.GENERAL
         );
 
-        Long commentId = commentService.write(memberId, postId, "test comment!");
+        Long commentId = commentService.write(memberId, postId, "test comment!", null);
         Comment comment = commentService.findById(commentId).get();
 
         comment.changeContent("change!");
@@ -94,7 +94,7 @@ class CommentServiceTest {
                 PostType.GENERAL
         );
 
-        Long commentId = commentService.write(memberId, postId, "test comment!");
+        Long commentId = commentService.write(memberId, postId, "test comment!", null);
 
         commentService.remove(commentId);
         Comment comment = commentService.findById(commentId).get();

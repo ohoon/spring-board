@@ -62,7 +62,13 @@ public class PostApiController {
         Result<Long> result = new Result<>();
 
         try {
-            Long commentId = commentService.write(commentWriteDto.getMemberId(), postId, commentWriteDto.getContent());
+            Long commentId = commentService.write(
+                    commentWriteDto.getMemberId(),
+                    postId,
+                    commentWriteDto.getContent(),
+                    commentWriteDto.getParentId()
+            );
+
             result.setSuccess(true);
             result.setData(commentId);
             result.setMessage("정상적으로 등록되었습니다.");

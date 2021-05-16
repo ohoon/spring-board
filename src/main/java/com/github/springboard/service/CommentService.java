@@ -37,7 +37,7 @@ public class CommentService {
     }
 
     @Transactional
-    public Long write(Long memberId, Long postId, String content) {
+    public Long write(Long memberId, Long postId, String content, Long parentId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundMemberException("존재하지 않는 회원입니다."));
 
@@ -45,6 +45,13 @@ public class CommentService {
                 .orElseThrow(() -> new NotFoundPostException("존재하지 않는 게시물입니다."));
 
         Comment comment = Comment.create(content, post, member);
+
+        if (parentId != null) {
+            Comment parent = commentRepository.findById(parentId)
+                    .orElseThrow(() -> new NotFoundCommentException("존재하지 않는 댓글입니다."));
+
+            comment.assignParent(parent);
+        }
 
         commentRepository.save(comment);
         return comment.getId();
