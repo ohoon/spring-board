@@ -1,6 +1,7 @@
 package com.github.springboard.repository;
 
 import com.github.springboard.domain.Comment;
+import com.github.springboard.domain.QComment;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,8 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
         List<Comment> content = queryFactory
                 .selectFrom(comment)
                 .leftJoin(comment.member, member).fetchJoin()
-                .where(comment.post.id.eq(postId))
+                .leftJoin(comment.children, new QComment("another")).fetchJoin()
+                .where(comment.post.id.eq(postId).and(comment.parent.isNull()))
                 .orderBy(comment.id.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

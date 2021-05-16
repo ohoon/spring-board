@@ -113,7 +113,7 @@
 
     function readComments(page) {
       const list = $('#comment_list');
-      const count = $('#comment_count');
+      const cmtCount = $('#comment_count');
       /*<![CDATA[*/
         const username = [[${currentMemberUsername}]];
         /*]]>*/
@@ -128,6 +128,7 @@
                 }
 
                 let html = "";
+                let count = result['data']['content']['length'];
                 $.each(result['data']['content'], (index, comment) => {
                   html += `<div class="row">`;
                   html += `  <div class="col">`;
@@ -139,17 +140,40 @@
                   html += `        <small class="text-muted ml-1">${moment(comment['createdDate']).format('YYYY-MM-DD HH:mm:ss')}</small>`;
                   html += `      </div>`;
                   html += `    </div>`;
-                  html += `    <div style="padding: 0.5rem">`;
-                  html += `      <span>${comment['removed'] ?
-                          '<small class="text-muted">(작성자에 의해 삭제된 댓글입니다)</small>' :
-                          comment['content']}</span>`;
-                  html += `    </div>`;
+                  html += comment['removed'] ?
+                          `    <div style="padding: 0.5rem">
+                                 <small class="text-muted">(작성자에 의해 삭제된 댓글입니다)</small>
+                               </div>` :
+                          `    <div id="comment" data-id="${comment['id']}" style="padding: 0.5rem; cursor: pointer">
+                                 <span>${comment['content']}</span>
+                               </div>`;
                   html += `  </div>`;
                   html += `</div>`;
                   html += `<hr/>`;
+                  count += comment['children']['length'];
+                  $.each(comment['children'], (index, reply) => {
+                    html += `<div class="row ml-4">`;
+                    html += `  <div class="col">`;
+                    html += `    <div style="padding-inline: 0.5rem">`;
+                    html += `      <small><strong>${reply['nickname']}</strong></small>`;
+                    html += `      <div class="float-right">`;
+                    html += reply['username'] === username && !reply['removed'] ?
+                            `<a href="#" onclick="removeComment(${reply['id']})"><small class="text-muted">삭제</small></a>` : ``;
+                    html += `        <small class="text-muted ml-1">${moment(reply['createdDate']).format('YYYY-MM-DD HH:mm:ss')}</small>`;
+                    html += `      </div>`;
+                    html += `    </div>`;
+                    html += `    <div style="padding: 0.5rem">`;
+                    html += `      <span>${reply['removed'] ?
+                            '<small class="text-muted">(작성자에 의해 삭제된 댓글입니다)</small>' :
+                            reply['content']}</span>`;
+                    html += `    </div>`;
+                    html += `  </div>`;
+                    html += `</div>`;
+                    html += `<hr/>`;
+                  })
                 })
                 list.html(html);
-                count.html(result['data']['content']['length']);
+                cmtCount.html(count);
               })
               .fail(() => {
                 return alert('댓글을 불러오지 못하였습니다.');

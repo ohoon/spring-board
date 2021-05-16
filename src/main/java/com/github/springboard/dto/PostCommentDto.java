@@ -1,33 +1,26 @@
 package com.github.springboard.dto;
 
 import com.github.springboard.domain.Comment;
-import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Data
-public class PostCommentDto {
+public class PostCommentDto extends PostCommentChildDto {
 
-    private Long id;
-
-    private String content;
-
-    private String username;
-
-    private String nickname;
-
-    private LocalDateTime createdDate;
-
-    private boolean isRemoved;
+    private final List<PostCommentChildDto> children = new ArrayList<>();
 
     //== 생성자 ==//
     public PostCommentDto(Comment comment) {
-        this.id = comment.getId();
-        this.content = comment.getContent();
-        this.username = comment.getMember().getUsername();
-        this.nickname = comment.getMember().getNickname();
-        this.createdDate = comment.getCreatedDate();
-        this.isRemoved = comment.isRemoved();
+        super(comment);
+
+        this.children.addAll(comment.getChildren().stream()
+                .map(PostCommentChildDto::new).collect(Collectors.toList()));
+    }
+
+    //== Getter ==//
+    public List<PostCommentChildDto> getChildren() {
+        return children;
     }
 
 }
