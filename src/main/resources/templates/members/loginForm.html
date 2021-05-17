@@ -10,6 +10,7 @@
   }
 </style>
 <body>
+  <nav th:replace="/fragments/navbar :: navbar(nickname=${member == null ? null : member.nickname})"></nav>
   <div class="container">
     <form action th:object="${loginForm}" method="post">
       <div class="form-group">

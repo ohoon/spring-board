@@ -32,12 +32,14 @@ public class PostController {
 
     @GetMapping("/posts")
     public String list(
+            @CurrentMember Member member,
             @ModelAttribute("condition") PostSearchCondition condition,
             @PageableDefault Pageable pageable,
             Model model
     ) {
         Page<Post> posts = postService.search(condition, pageable);
         Page<PostListDto> postPage = posts.map(PostListDto::new);
+        model.addAttribute("member", member);
         model.addAttribute("posts", postPage.getContent());
         model.addAttribute("totalPages", postPage.getTotalPages());
         return "posts/list";
@@ -45,7 +47,8 @@ public class PostController {
 
     @PreAuthorize("hasRole('MEMBER')")
     @GetMapping("/posts/write")
-    public String writeForm(Model model) {
+    public String writeForm(@CurrentMember Member member, Model model) {
+        model.addAttribute("member", member);
         model.addAttribute("writeForm", new PostWriteForm());
         return "posts/writeForm";
     }
@@ -74,6 +77,7 @@ public class PostController {
     ) {
         Post post = postService.read(postId);
         postService.visit(postId);
+        model.addAttribute("member", member);
         model.addAttribute("currentMemberId", member != null ? member.getId() : null);
         model.addAttribute("currentMemberUsername", member != null ? member.getUsername() : null);
         model.addAttribute("post", post);
@@ -82,8 +86,13 @@ public class PostController {
 
     @PreAuthorize("@postService.isWriter(#postId, authentication.name)")
     @GetMapping("/posts/{id}/edit")
-    public String editForm(@PathVariable("id") Long postId, Model model) {
+    public String editForm(
+            @CurrentMember Member member,
+            @PathVariable("id") Long postId,
+            Model model
+    ) {
         Post post = postService.read(postId);
+        model.addAttribute("member", member);
         model.addAttribute("editForm", new PostWriteForm(post));
         return "posts/editForm";
     }

@@ -2,13 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/header :: header"></head>
 <body>
+  <nav th:replace="/fragments/navbar :: navbar(nickname=${member == null ? null : member.nickname})"></nav>
   <div class="container">
-    <ul>
-      <li><a th:href="@{/members/signup}" th:text="회원가입"></a></li>
-      <li th:if="${member == null}"><a th:href="@{/members/login}" th:text="로그인"></a></li>
-      <li th:unless="${member == null}"><span th:text="|${member.nickname}님 안녕하세요|"></span> <button class="btn btn-secondary btn-sm" th:onclick="|location.href='@{/members/logout}'|" th:text="로그아웃"></button></li>
-      <li><a th:href="@{/posts}" th:text="게시판"></a></li>
-    </ul>
+    Hello World
     <div th:replace="/fragments/footer :: footer"></div>
   </div>
 </body>
