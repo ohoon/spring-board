@@ -27,11 +27,24 @@
     <div th:utext="${post.content}"></div>
     <div class="text-center">
       <button class="btn btn-secondary" type="button" id="like" th:text="|추천 ${post.like}|"
-              th:onclick="|vote(${currentMemberId}, ${post.id}, ${true})|"></button>
+              th:onclick="|vote(${true})|"></button>
       <button class="btn btn-danger" type="button" id="hate" th:text="|비추천 ${post.hate}|"
-              th:onclick="|vote(${currentMemberId}, ${post.id}, ${false})|"></button>
+              th:onclick="|vote(${false})|"></button>
     </div>
     <hr />
+    <div class="row mb-4">
+      <div class="col">
+        <strong>전체 댓글 <span class="text-danger" id="comment_count"></span>개</strong>
+      </div>
+    </div>
+    <div id="comment_list"></div>
+    <div class="input-group mb-5" id="comment_write_box">
+      <textarea class="form-control" style="resize: none" id="comment_input"></textarea>
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" id="comment_write" type="button"
+                th:onclick="writeComment()">작성</button>
+      </div>
+    </div>
     <div class="row">
       <div class="col">
         <button class="btn btn-dark" type="button" th:onclick="|location.href='@{/posts}'|">전체글</button>
@@ -52,13 +65,58 @@
     </div>
     <div th:replace="/fragments/footer :: footer"></div>
   </div>
-  <script>
-    function vote(memberId, postId, isLike) {
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    const postId = [[${post.id}]];
+    const memberId = [[${currentMemberId}]];
+    /*]]>*/
+    $(document).ready(() => {
+      readComments(0);
+    });
+
+    $(document).on('keypress', '#comment_input', e => {
+      if (e.keyCode === 13 && !e.shiftKey) {
+        $('#comment_write').click();
+        return false;
+      }
+    });
+
+    $(document).on('keypress', '#reply_input', e => {
+      if (e.keyCode === 13 && !e.shiftKey) {
+        $('#reply_write').click();
+        return false;
+      }
+    });
+
+    $(document).on('click', '#comment', e => {
+      if ($(e.currentTarget).parent().find('#reply_write_box').length > 0) {
+        $(e.currentTarget).parent().find('#reply_write_box').remove();
+        return;
+      }
+
+      $(document).find('#reply_write_box').remove();
+      $(e.currentTarget).parent().append(
+              `<div class="input-group mt-4" id="reply_write_box">
+                 <input id="parent_id" type="hidden" value="${$(e.currentTarget).attr('data-id')}">
+                 <textarea class="form-control" style="resize: none" id="reply_input"></textarea>
+                 <div class="input-group-append">
+                   <button class="btn btn-outline-secondary" id="reply_write" type="button" onclick="writeReply()">작성</button>
+                 </div>
+               </div>`
+      );
+    });
+
+    function vote(isLike) {
       const postVoteDto = {
         memberId: memberId,
         postId: postId,
         isLike: isLike
       };
+
+      if (memberId == null) {
+        alert("로그인이 필요한 서비스입니다.");
+        return false;
+      }
 
       $.ajax({
         type:"POST",
@@ -79,7 +137,187 @@
                 }
               })
               .fail(() => {
-                return alert('로그인이 필요합니다.');
+                return alert('예상치 못한 에러가 발생하였습니다.');
+              });
+    }
+
+    function readComments(page) {
+      const list = $('#comment_list');
+      const cmtCount = $('#comment_count');
+      /*<![CDATA[*/
+        const username = [[${currentMemberUsername}]];
+        /*]]>*/
+
+      $.ajax({
+        type:"GET",
+        url: "/api/posts/" + postId + "/comments?page=" + page,
+      })
+              .done(result => {
+                if (!result['success']) {
+                  return alert(result['message']);
+                }
+
+                let html = "";
+                let count = result['data']['content']['length'];
+                $.each(result['data']['content'], (index, comment) => {
+                  html += `<div class="row">`;
+                  html += `  <div class="col">`;
+                  html += `    <div style="padding-inline: 0.5rem">`;
+                  html += `      <small><strong>${comment['nickname']}</strong></small>`;
+                  html += `      <div class="float-right">`;
+                  html += comment['username'] === username && !comment['removed'] ?
+                          `<a href="#" onclick="removeComment(${comment['id']})"><small class="text-muted">삭제</small></a>` : ``;
+                  html += `        <small class="text-muted ml-1">${moment(comment['createdDate']).format('YYYY-MM-DD HH:mm:ss')}</small>`;
+                  html += `      </div>`;
+                  html += `    </div>`;
+                  html += comment['removed'] ?
+                          `    <div style="padding: 0.5rem">
+                                 <small class="text-muted">(작성자에 의해 삭제된 댓글입니다)</small>
+                               </div>` :
+                          `    <div id="comment" data-id="${comment['id']}" style="padding: 0.5rem; cursor: pointer">
+                                 <span>${comment['content']}</span>
+                               </div>`;
+                  html += `  </div>`;
+                  html += `</div>`;
+                  html += `<hr/>`;
+                  count += comment['children']['length'];
+                  $.each(comment['children'], (index, reply) => {
+                    html += `<div class="row ml-4">`;
+                    html += `  <div class="col">`;
+                    html += `    <div style="padding-inline: 0.5rem">`;
+                    html += `      <small><strong>${reply['nickname']}</strong></small>`;
+                    html += `      <div class="float-right">`;
+                    html += reply['username'] === username && !reply['removed'] ?
+                            `<a href="#" onclick="removeComment(${reply['id']})"><small class="text-muted">삭제</small></a>` : ``;
+                    html += `        <small class="text-muted ml-1">${moment(reply['createdDate']).format('YYYY-MM-DD HH:mm:ss')}</small>`;
+                    html += `      </div>`;
+                    html += `    </div>`;
+                    html += `    <div style="padding: 0.5rem">`;
+                    html += `      <span>${reply['removed'] ?
+                            '<small class="text-muted">(작성자에 의해 삭제된 댓글입니다)</small>' :
+                            reply['content']}</span>`;
+                    html += `    </div>`;
+                    html += `  </div>`;
+                    html += `</div>`;
+                    html += `<hr/>`;
+                  })
+                })
+                list.html(html);
+                cmtCount.html(count);
+              })
+              .fail(() => {
+                return alert('댓글을 불러오지 못하였습니다.');
+              });
+    }
+
+    function writeComment() {
+      const input = $('#comment_input');
+
+      const postCommentWriteDto = {
+        memberId: memberId,
+        content: input.val(),
+        parentId: null
+      };
+
+      if (memberId == null) {
+        alert("로그인이 필요한 서비스입니다.");
+        return false;
+      }
+
+      if (!input.val()) {
+        alert("내용을 입력해주세요.");
+        return false;
+      }
+
+      $.ajax({
+        type:"POST",
+        url: "/api/posts/" + postId + "/comments",
+        data: JSON.stringify(postCommentWriteDto),
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+      })
+              .done(result => {
+                if (!result['success']) {
+                  return alert(result['message']);
+                }
+
+                readComments(0);
+                input.val("");
+                input.focus();
+              })
+              .fail(() => {
+                return alert('예상치 못한 에러가 발생하였습니다.');
+              });
+    }
+
+    function removeComment(commentId) {
+      const memberSimpleAuthDto = {
+          memberId: memberId
+      };
+
+      if (memberId == null) {
+        alert("로그인이 필요한 서비스입니다.");
+        return false;
+      }
+
+      $.ajax({
+          type:"POST",
+          url: "/api/posts/" + postId + "/comments/" + commentId,
+          data: JSON.stringify(memberSimpleAuthDto),
+          dataType: "json",
+          contentType: "application/json; charset=utf-8",
+      })
+          .done(result => {
+              if (!result['success']) {
+                  return alert(result['message']);
+              }
+
+              readComments(0);
+              alert("정상적으로 삭제되었습니다.");
+          })
+          .fail(() => {
+              return alert('예상치 못한 에러가 발생하였습니다.');
+          });
+    }
+
+    function writeReply() {
+      const input = $('#reply_input');
+      const parentId = $('#parent_id');
+
+      const postCommentWriteDto = {
+        memberId: memberId,
+        content: input.val(),
+        parentId: parentId.val()
+      };
+
+      if (memberId == null) {
+        alert("로그인이 필요한 서비스입니다.");
+        return false;
+      }
+
+      if (!input.val()) {
+        alert("내용을 입력해주세요.");
+        return false;
+      }
+
+      $.ajax({
+        type:"POST",
+        url: "/api/posts/" + postId + "/comments",
+        data: JSON.stringify(postCommentWriteDto),
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+      })
+              .done(result => {
+                if (!result['success']) {
+                  return alert(result['message']);
+                }
+
+                readComments(0);
+                input.val("");
+                input.focus();
+              })
+              .fail(() => {
+                return alert('예상치 못한 에러가 발생하였습니다.');
               });
     }
   </script>

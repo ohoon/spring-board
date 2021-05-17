@@ -31,20 +31,29 @@
       </thead>
       <tbody>
       <tr th:each="post : ${posts}">
-        <td th:if="${post.type.name() == 'NOTICE'}"><small th:text="공지"></small></td>
-        <td th:unless="${post.type.name() == 'NOTICE'}"><small th:text="${post.id}"></small></td>
-        <td th:if="${post.type.name() == 'NOTICE'}" style="text-align: left"><a th:href="|@{/posts/{id}(id=${post.id})}|"><strong th:text="${post.subject}"></strong></a></td>
-        <td th:unless="${post.type.name() == 'NOTICE'}" style="text-align: left"><a th:href="|@{/posts/{id}(id=${post.id})}|" th:text="${post.subject}"></a></td>
+        <td>
+          <small th:if="${post.type.name() == 'NOTICE'}" th:text="공지"></small>
+          <small th:unless="${post.type.name() == 'NOTICE'}" th:text="${post.id}"></small>
+        </td>
+        <td style="text-align: left">
+          <a th:href="|@{/posts/{id}(id=${post.id})}|">
+            <strong th:if="${post.type.name() == 'NOTICE'}" th:text="${post.subject}"></strong>
+            <span th:unless="${post.type.name() == 'NOTICE'}" th:text="${post.subject}"></span>
+            <small th:if="${post.commentCount > 0}"
+                   th:text="' [' + ${post.commentCount} + '] '"
+                   class="text-muted"></small>
+          </a>
+        </td>
         <td th:text="${post.nickname}"></td>
-        <td th:if="${post.createdDate.isAfter(post.createdDate.now().minusDays(1))}">
-          <small th:text="${#temporals.format(post.createdDate, 'HH:mm')}"></small>
-        </td>
-        <td th:unless="${post.createdDate.isAfter(post.createdDate.now().minusDays(1))}"
-            th:if="${post.createdDate.year == post.createdDate.now().year}">
-          <small th:text="${#temporals.format(post.createdDate, 'MM.dd')}"></small>
-        </td>
-        <td th:unless="${post.createdDate.isAfter(post.createdDate.now().minusDays(1)) || post.createdDate.year == post.createdDate.now().year}">
-          <small th:text="${#temporals.format(post.createdDate, 'yyyy/MM/dd')}"></small>
+        <td>
+          <small th:if="${post.createdDate.isAfter(post.createdDate.now().minusDays(1))}"
+                 th:text="${#temporals.format(post.createdDate, 'HH:mm')}"></small>
+          <small th:unless="${post.createdDate.isAfter(post.createdDate.now().minusDays(1))}"
+                 th:if="${post.createdDate.year == post.createdDate.now().year}"
+                 th:text="${#temporals.format(post.createdDate, 'MM.dd')}"></small>
+          <small th:unless="${post.createdDate.isAfter(post.createdDate.now().minusDays(1)) ||
+           post.createdDate.year == post.createdDate.now().year}"
+                 th:text="${#temporals.format(post.createdDate, 'yyyy/MM/dd')}"></small>
         </td>
         <td><small th:text="${post.hit}"></small></td>
         <td><small th:text="${post.like}"></small></td>

@@ -1,10 +1,6 @@
 package com.github.springboard.web;
 
-import com.github.springboard.domain.Member;
-import com.github.springboard.domain.MemberRole;
-import com.github.springboard.domain.Role;
-import com.github.springboard.domain.Post;
-import com.github.springboard.domain.PostType;
+import com.github.springboard.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -77,6 +73,33 @@ public class InitController {
             em.persist(postC);
             em.persist(postD);
             em.persist(postE);
+
+            Comment commentA = Comment.create("Sometimes, you need to mark parts of your code for future reference:" +
+                    " areas of optimization and improvement, possible changes, questions to be discussed, and so on.", postA, memberA);
+            Comment commentB = Comment.create("Sometimes, you need to mark parts of your code for future reference:" +
+                    " areas of optimization and improvement, possible changes, questions to be discussed, and so on.", postA, memberB);
+            Comment commentC = Comment.create("Sometimes, you need to mark parts of your code for future reference:", postA, memberC);
+            Comment commentD = Comment.create("Sometimes, you need to mark parts of your code for future reference:" +
+                    " areas of optimization and improvement, possible changes, questions to be discussed, and so on.", postB, memberA);
+            Comment commentE = Comment.create("Sometimes, you need to mark parts of your code for future reference:" +
+                    " areas of optimization and improvement, possible changes, questions to be discussed, and so on.", postC, memberB);
+            em.persist(commentA);
+            em.persist(commentB);
+            em.persist(commentC);
+            em.persist(commentD);
+            em.persist(commentE);
+
+            Comment replyA = Comment.create("Sometimes, you need to mark parts of your code for future reference:", postA, memberA);
+            Comment replyB = Comment.create("Sometimes, you need to mark parts of your code for future reference:" +
+                    " areas of optimization and improvement, possible changes, questions to be discussed, and so on.", postA, memberC);
+            Comment replyC = Comment.create(" areas of optimization and improvement, possible changes," +
+                    " questions to be discussed, and so on.", postA, memberB);
+            replyA.assignParent(commentA);
+            replyB.assignParent(commentA);
+            replyC.assignParent(commentB);
+            em.persist(replyA);
+            em.persist(replyB);
+            em.persist(replyC);
         }
 
     }
