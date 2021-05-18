@@ -13,8 +13,11 @@ import com.github.springboard.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -42,6 +45,10 @@ public class PostService {
 
     public Page<Post> search(PostSearchCondition condition, Pageable pageable) {
         return postRepository.search(condition, pageable);
+    }
+
+    public List<Post> recentList() {
+        return postRepository.findFirst6ByOrderByIdDesc();
     }
 
     @Transactional
