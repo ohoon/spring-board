@@ -4,7 +4,35 @@
 <body>
   <nav th:replace="/fragments/navbar :: navbar(nickname=${member == null ? null : member.nickname})"></nav>
   <div class="container">
-    Hello World
+    <div class="row">
+      <div class="col-6">
+        <div class="card px-3">
+          <div class="card-body">
+            <h5 class="card-title">최근 게시물</h5>
+            <p class="card-text" th:each="recentPost : ${recentPosts}">
+              <a th:href="@{/posts/{id}(id=${recentPost.id})}">
+                <span class="d-inline-block align-bottom text-truncate" style="max-width: 70%;" th:text="${recentPost.subject}"></span>
+                <small class="text-muted" th:text="'[' + ${recentPost.comments.size()} + ']'"></small>
+                <span class="badge badge-secondary float-right" th:text="${#temporals.format(recentPost.createdDate, 'MM/dd HH:mm:ss')}"></span>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="card px-3">
+          <div class="card-body">
+            <h5 class="card-title">최근 댓글</h5>
+            <p class="card-text" th:each="recentComment : ${recentComments}">
+              <a th:href="@{/posts/{id}(id=${recentComment.post.id})}">
+                <span class="d-inline-block align-bottom text-truncate" style="max-width: 75%;" th:text="${recentComment.content}"></span>
+                <span class="badge badge-secondary float-right" th:text="${#temporals.format(recentComment.createdDate, 'MM/dd HH:mm:ss')}"></span>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
     <div th:replace="/fragments/footer :: footer"></div>
   </div>
 </body>
