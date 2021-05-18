@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,6 +35,10 @@ public class CommentService {
 
     public Page<Comment> list(Long postId, Pageable pageable) {
         return commentRepository.list(postId, pageable);
+    }
+
+    public List<Comment> recentList() {
+        return commentRepository.findFirst6ByOrderByIdDesc();
     }
 
     @Transactional
