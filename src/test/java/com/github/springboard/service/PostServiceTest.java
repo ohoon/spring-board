@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -156,6 +158,34 @@ class PostServiceTest {
 
         //then
         assertThat(findPost.getHit()).isEqualTo(3);
+    }
+
+    @Test
+    void recentList() {
+        //given
+        Long memberId = memberService.join("ohoon", "password", "ohoon", "ohoon@example.org");
+
+        for (int i = 0; i < 13; i++) {
+            postService.write(
+                    memberId,
+                    "testing" + i,
+                    "Sometimes, you need to mark parts of your code for future reference:" +
+                            " areas of optimization and improvement, possible changes, questions to be discussed, and so on." +
+                            " IntelliJ IDEA lets you add special types of comments that are highlighted in the editor, indexed, and" +
+                            " listed in the TODO tool window." +
+                            " This way you and your teammates can keep track of issues that require attention.\n",
+                    PostType.GENERAL
+            );
+        }
+
+        //when
+        List<Post> posts = postService.recentList();
+
+        //then
+        assertThat(posts.size()).isEqualTo(6);
+        assertThat(posts)
+                .extracting("subject")
+                .containsExactly("testing12", "testing11", "testing10", "testing9", "testing8");
     }
 
 }

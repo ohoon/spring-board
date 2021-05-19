@@ -10,6 +10,7 @@
   }
 </style>
 <body>
+  <nav th:replace="/fragments/navbar :: navbar(nickname=${member == null ? null : member.nickname})"></nav>
   <div class="container">
     <div class="py-3 text-center">
       <h3>게시물 작성</h3>
