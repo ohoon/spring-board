@@ -13,8 +13,8 @@
         <a class="nav-link" th:href="@{/posts}">게시판</a>
       </li>
     </ul>
-    <form th:action="@{/posts}" method="get" class="form-inline mx-3 my-2 my-lg-0">
-      <input class="form-control mr-sm-2" name="search" type="search" placeholder="Search" aria-label="Search">
+    <form class="form-inline mx-3 my-2 my-lg-0" th:action="@{/posts}" method="get">
+      <input class="form-control mr-sm-2" name="keyword" type="search" placeholder="통합검색">
       <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
     </form>
     <button th:if="${nickname == null}" th:onclick="|location.href='@{/members/login}'|" class="btn btn-dark">로그인</button>
