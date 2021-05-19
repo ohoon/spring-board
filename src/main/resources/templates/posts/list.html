@@ -65,10 +65,28 @@
       </tbody>
     </table>
     <div class="row">
-      <div class="col">
+      <div class="col-2">
         <button class="btn btn-dark" type="button" th:onclick="|location.href='@{/posts}'|">전체글</button>
       </div>
-      <div class="col">
+      <div class="col-5 m-auto">
+        <form th:object="${condition}">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <select class="form-control" th:field="*{mode}">
+                <option value="SUBJECT_CONTENT" selected>제목/내용</option>
+                <option value="SUBJECT">제목</option>
+                <option value="CONTENT">내용</option>
+                <option value="WRITER">글쓴이</option>
+              </select>
+            </div>
+            <input class="form-control" id="search" type="text" th:field="*{keyword}">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="submit">검색</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-2">
         <button class="btn btn-dark float-right" type="button" th:onclick="|location.href='@{/posts/write}'|">글쓰기</button>
       </div>
     </div>

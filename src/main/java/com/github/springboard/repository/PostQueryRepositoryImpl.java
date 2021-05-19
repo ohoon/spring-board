@@ -1,7 +1,6 @@
 package com.github.springboard.repository;
 
 import com.github.springboard.domain.Post;
-import com.github.springboard.domain.QComment;
 import com.github.springboard.dto.PostSearchCondition;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -30,7 +29,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .selectFrom(post)
                 .leftJoin(post.member, member).fetchJoin()
                 .leftJoin(post.comments, comment).fetchJoin()
-                .where(allContains(condition).and(post.isRemoved.isFalse()))
+                .where(searchFilter(condition).and(post.isRemoved.isFalse()))
                 .orderBy(post.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -38,16 +37,26 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         JPAQuery<Post> countQuery = queryFactory
                 .selectFrom(post)
-                .where(allContains(condition).and(post.isRemoved.isFalse()));
+                .where(searchFilter(condition).and(post.isRemoved.isFalse()));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
     }
 
-    private BooleanBuilder allContains(PostSearchCondition condition) {
-        return subjectOrContentContains(condition.getSubjectOrContent())
-                .and(subjectContains(condition.getSubject()))
-                .and(contentContains(condition.getContent()))
-                .and(nicknameContains(condition.getUsername()));
+    private BooleanBuilder searchFilter(PostSearchCondition condition) {
+        String keyword = condition.getKeyword();
+
+        switch (condition.getMode()) {
+            case SUBJECT_CONTENT:
+                return subjectOrContentContains(keyword);
+            case SUBJECT:
+                return subjectContains(keyword);
+            case CONTENT:
+                return contentContains(keyword);
+            case WRITER:
+                return writerContains(keyword);
+            default:
+                return new BooleanBuilder();
+        }
     }
 
     private BooleanBuilder subjectOrContentContains(String subjectOrContent) {
@@ -61,6 +70,15 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private BooleanBuilder contentContains(String content) {
         return nullSafeBuilder(() -> post.content.contains(hasText(content) ? content : null));
+    }
+
+    private BooleanBuilder writerContains(String writer) {
+        return usernameContains(writer)
+                .or(nicknameContains(writer));
+    }
+
+    private BooleanBuilder usernameContains(String username) {
+        return nullSafeBuilder(() -> post.member.username.contains(hasText(username) ? username : null));
     }
 
     private BooleanBuilder nicknameContains(String nickname) {

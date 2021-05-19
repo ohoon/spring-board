@@ -2,15 +2,15 @@ package com.github.springboard.dto;
 
 import lombok.Data;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
 @Data
 public class PostSearchCondition {
 
-    private String subjectOrContent;
+    @Enumerated(EnumType.STRING)
+    private PostSearchMode mode = PostSearchMode.SUBJECT_CONTENT;
 
-    private String subject;
-
-    private String content;
-
-    private String username;
+    private String keyword;
 
 }
