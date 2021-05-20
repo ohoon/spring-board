@@ -69,6 +69,14 @@
         <button class="btn btn-dark" type="button" th:onclick="|location.href='@{/posts}'|">전체글</button>
       </div>
       <div class="col-5 m-auto">
+        <nav th:replace="/fragments/pagination :: pagination(current=${currentPage}, total=${totalPages})"></nav>
+      </div>
+      <div class="col-2">
+        <button class="btn btn-dark float-right" type="button" th:onclick="|location.href='@{/posts/write}'|">글쓰기</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-5 m-auto">
         <form th:object="${condition}">
           <div class="input-group">
             <div class="input-group-prepend">
@@ -85,9 +93,6 @@
             </div>
           </div>
         </form>
-      </div>
-      <div class="col-2">
-        <button class="btn btn-dark float-right" type="button" th:onclick="|location.href='@{/posts/write}'|">글쓰기</button>
       </div>
     </div>
     <div th:replace="/fragments/footer :: footer"></div>
