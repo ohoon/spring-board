@@ -41,6 +41,7 @@ public class PostController {
         Page<PostListDto> postPage = posts.map(PostListDto::new);
         model.addAttribute("member", member);
         model.addAttribute("posts", postPage.getContent());
+        model.addAttribute("currentPage", postPage.getNumber());
         model.addAttribute("totalPages", postPage.getTotalPages());
         return "posts/list";
     }
