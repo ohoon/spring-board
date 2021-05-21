@@ -41,6 +41,10 @@ public class CommentService {
         return commentRepository.findFirst6ByOrderByIdDesc();
     }
 
+    public int countByPostId(Long postId) {
+        return commentRepository.countByPostId(postId);
+    }
+
     @Transactional
     public Long write(Long memberId, Long postId, String content, Long parentId) {
         Member member = memberRepository.findById(memberId)
