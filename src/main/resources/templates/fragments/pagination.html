@@ -4,17 +4,17 @@
   <nav th:fragment="pagination(current, total)">
     <ul class="pagination justify-content-center">
       <li class="page-item" th:unless="${current < 10}">
-        <a class="page-link" th:href="@{/posts(page=${(current / 10) * 10})}">
+        <a class="page-link" th:href="@{/posts(p=${current - current % 10})}">
           <span>&laquo;</span>
         </a>
       </li>
-      <li th:each="p : ${#numbers.sequence((current / 10) * 10 + 1, T(Math).min(((current + 10) / 10) * 10, total))}"
+      <li th:each="p : ${#numbers.sequence(current - current % 10 + 1, T(Math).min(current - current % 10 + 10, total))}"
           th:class="${p == current + 1 ? 'page-item active' : 'page-item'}">
         <a class="page-link" th:href="@{/posts(p=${p})}" th:text="${p}"></a>
       </li>
-      <li class="page-item" th:if="${current < ((total - 1) / 10) * 10}">
-        <a class="page-link" th:href="@{/posts(p=${((current + 10) / 10) * 10 + 1})}">
-          <span aria-hidden="true">&raquo;</span>
+      <li class="page-item" th:if="${current < (total - 1) - (total - 1) % 10}">
+        <a class="page-link" th:href="@{/posts(p=${current - current % 10 + 11})}">
+          <span>&raquo;</span>
         </a>
       </li>
     </ul>
