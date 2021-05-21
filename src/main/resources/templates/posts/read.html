@@ -53,12 +53,12 @@
       <div class="col">
         <div class="float-right">
           <form th:action="|@{/posts/{id}/remove(id=${post.id})}|" method="post"
-                th:if="${post.member.username == currentMemberUsername}"
+                th:if="${post.member.username == (member == null ? null : member.username)}"
                 style="display: inline">
             <button class="btn btn-danger" type="submit">글삭제</button>
           </form>
           <button class="btn btn-info" type="button"
-                  th:if="${post.member.username == currentMemberUsername}"
+                  th:if="${post.member.username == (member == null ? null : member.username)}"
                   th:onclick="|location.href='@{/posts/{id}/edit(id=${post.id})}'|">글수정</button>
           <button class="btn btn-dark" type="button" th:onclick="|location.href='@{/posts/write}'|">글쓰기</button>
         </div>
@@ -69,10 +69,11 @@
   <script th:inline="javascript">
     /*<![CDATA[*/
     const postId = [[${post.id}]];
-    const memberId = [[${currentMemberId}]];
+    const memberId = [[${member == null ? null : member.id}]];
+    const commentPageNumber = [[${commentPageNumber}]];
     /*]]>*/
     $(document).ready(() => {
-      readComments(0);
+      readComments(commentPageNumber);
     });
 
     $(document).on('keypress', '#comment_input', e => {
@@ -146,12 +147,12 @@
       const list = $('#comment_list');
       const cmtCount = $('#comment_count');
       /*<![CDATA[*/
-        const username = [[${currentMemberUsername}]];
+        const username = [[${member == null ? null : member.username}]];
         /*]]>*/
 
       $.ajax({
         type:"GET",
-        url: "/api/posts/" + postId + "/comments?page=" + page,
+        url: "/api/posts/" + postId + "/comments?p=" + page,
       })
               .done(result => {
                 if (!result['success']) {
@@ -159,8 +160,9 @@
                 }
 
                 let html = "";
-                let count = result['data']['content']['length'];
-                $.each(result['data']['content'], (index, comment) => {
+                for (let i = result['data']['content']['length'] - 1; i >= 0; i--) {
+                  let comment = result['data']['content'][i];
+
                   html += `<div class="row">`;
                   html += `  <div class="col">`;
                   html += `    <div style="padding-inline: 0.5rem">`;
@@ -181,7 +183,8 @@
                   html += `  </div>`;
                   html += `</div>`;
                   html += `<hr/>`;
-                  count += comment['children']['length'];
+
+                  // Replies
                   $.each(comment['children'], (index, reply) => {
                     html += `<div class="row ml-4">`;
                     html += `  <div class="col">`;
@@ -201,13 +204,62 @@
                     html += `  </div>`;
                     html += `</div>`;
                     html += `<hr/>`;
-                  })
-                })
+                  });
+                }
+
+                // Pagination
+                const currentPage = result['data']['number'];
+                const totalPages = result['data']['totalPages'];
+                const firstPage = currentPage - currentPage % 10;
+
+                if (totalPages > 1) {
+                  html += `<div class="row">`;
+                  html += `    <div class="col-5 m-auto">`;
+                  html += `        <nav>`;
+                  html += `            <ul class="pagination justify-content-center">`;
+                  html += currentPage >= 10 ? `<li class="page-item">
+                                                 <a class="page-link" href="/posts/${postId}?cp=${currentPage - currentPage % 10}">
+                                                    <span>&laquo;</span>
+                                                 </a>
+                                             </li>` : ``;
+
+                  for (let p = firstPage + 1; p <= Math.min(firstPage + 10, totalPages); p++) {
+                    html += `              <li class="page-item ${p === currentPage + 1 ? 'active' : ''}">`;
+                    html += `                  <a class="page-link" href="/posts/${postId}?cp=${p}">${p}</a>`;
+                    html += `              </li>`;
+                  }
+
+                  html += currentPage < (totalPages - 1) - (totalPages - 1) % 10 ? `
+                                        <li class="page-item">
+                                                 <a class="page-link" href="/posts/${postId}?cp=${currentPage - currentPage % 10 + 11}">
+                                                    <span>&raquo;</span>
+                                                 </a>
+                                        </li>` : ``;
+                  html += `            </ul>`;
+                  html += `        </nav>`;
+                  html += `    </div>`;
+                  html += `</div>`;
+                }
+
                 list.html(html);
-                cmtCount.html(count);
               })
               .fail(() => {
                 return alert('댓글을 불러오지 못하였습니다.');
+              });
+
+      $.ajax({
+        type:"GET",
+        url: "/api/posts/" + postId + "/comments/count",
+      })
+              .done(result => {
+                if (!result['success']) {
+                  return alert(result['message']);
+                }
+
+                cmtCount.html(result['data']);
+              })
+              .fail(() => {
+                return alert('댓글 개수를 불러오지 못하였습니다.');
               });
     }
 
@@ -242,7 +294,7 @@
                   return alert(result['message']);
                 }
 
-                readComments(0);
+                readComments(1);
                 input.val("");
                 input.focus();
               })
@@ -273,7 +325,7 @@
                   return alert(result['message']);
               }
 
-              readComments(0);
+              readComments(commentPageNumber);
               alert("정상적으로 삭제되었습니다.");
           })
           .fail(() => {
@@ -313,7 +365,7 @@
                   return alert(result['message']);
                 }
 
-                readComments(0);
+                readComments(commentPageNumber);
                 input.val("");
                 input.focus();
               })
