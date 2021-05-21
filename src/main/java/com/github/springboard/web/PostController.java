@@ -16,10 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
@@ -41,6 +38,7 @@ public class PostController {
         Page<PostListDto> postPage = posts.map(PostListDto::new);
         model.addAttribute("member", member);
         model.addAttribute("posts", postPage.getContent());
+        model.addAttribute("currentPage", postPage.getNumber());
         model.addAttribute("totalPages", postPage.getTotalPages());
         return "posts/list";
     }
@@ -73,14 +71,14 @@ public class PostController {
     public String read(
             @CurrentMember Member member,
             @PathVariable("id") Long postId,
+            @RequestParam(name = "cp", defaultValue = "1") Long commentPageNumber,
             Model model
     ) {
         Post post = postService.read(postId);
         postService.visit(postId);
         model.addAttribute("member", member);
-        model.addAttribute("currentMemberId", member != null ? member.getId() : null);
-        model.addAttribute("currentMemberUsername", member != null ? member.getUsername() : null);
         model.addAttribute("post", post);
+        model.addAttribute("commentPageNumber", commentPageNumber);
         return "posts/read";
     }
 

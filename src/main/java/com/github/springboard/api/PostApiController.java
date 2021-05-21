@@ -9,6 +9,7 @@ import com.github.springboard.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -39,8 +40,26 @@ public class PostApiController {
         return result;
     }
 
+    @GetMapping("/api/posts/{id}/comments/count")
+    public Result<Integer> countComments(@PathVariable("id") Long postId) {
+        Result<Integer> result = new Result<>();
+
+        try {
+            int count = commentService.countByPostId(postId);
+            result.setSuccess(true);
+            result.setData(count);
+            result.setMessage("정상적으로 불러왔습니다.");
+        } catch (Exception e) {
+            result.setSuccess(false);
+            result.setData(null);
+            result.setMessage(e.getMessage());
+        }
+
+        return result;
+    }
+
     @GetMapping("/api/posts/{id}/comments")
-    public Result<Page<PostCommentDto>> readComments(@PathVariable("id") Long postId, Pageable pageable) {
+    public Result<Page<PostCommentDto>> readComments(@PathVariable("id") Long postId, @PageableDefault Pageable pageable) {
         Result<Page<PostCommentDto>> result = new Result<>();
 
         try {

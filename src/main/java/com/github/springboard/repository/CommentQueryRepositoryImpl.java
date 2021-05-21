@@ -26,14 +26,14 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 .leftJoin(comment.member, member).fetchJoin()
                 .leftJoin(comment.children, new QComment("another")).fetchJoin()
                 .where(comment.post.id.eq(postId).and(comment.parent.isNull()))
-                .orderBy(comment.id.asc())
+                .orderBy(comment.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         JPAQuery<Comment> countQuery = queryFactory
                 .selectFrom(comment)
-                .where(comment.post.id.eq(postId));
+                .where(comment.post.id.eq(postId).and(comment.parent.isNull()));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
     }
