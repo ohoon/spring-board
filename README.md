@@ -8,3 +8,15 @@
 **ORM:** Spring Data JPA, Querydsl
 
 **Template Engine:** Thymeleaf
+
+**Authentication:** Spring Security
+
+**Markdown Editor:** Summernote
+
+### How to run this project in your local machine
+
+- `git clone https://github.com/ohoon/spring-board.git`
+
+- `yarn install` or `npm install`
+
+- `yarn start` or `npm start`
