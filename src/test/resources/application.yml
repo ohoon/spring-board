@@ -1,0 +1,29 @@
+spring:
+  profiles:
+    active: test
+
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/spring-board
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 1000
+
+  data:
+    web:
+      pageable:
+        page-parameter: p
+        one-indexed-parameters: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.springframework.security: debug

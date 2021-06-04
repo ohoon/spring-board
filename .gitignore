@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Init Controller for test ###
+/src/main/java/com/github/springboard/web/InitController.java
