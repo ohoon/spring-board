@@ -2,10 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/header :: header"></head>
 <style>
-  a {
+  td a {
     color: #111;
   }
-  a:hover {
+  td a:hover {
     color: #111;
   }
   table {
@@ -37,7 +37,14 @@
           <small th:unless="${post.type.name() == 'NOTICE'}" th:text="${post.id}"></small>
         </td>
         <td style="text-align: left">
-          <a th:href="|@{/posts/{id}(id=${post.id})}|">
+          <a th:if="${condition.keyword != null}" th:href="|@{/posts/{id}(id=${post.id}, mode=${condition.mode}, keyword=${condition.keyword}, p=${currentPage + 1})}|">
+            <strong th:if="${post.type.name() == 'NOTICE'}" th:text="${post.subject}"></strong>
+            <span th:unless="${post.type.name() == 'NOTICE'}" th:text="${post.subject}"></span>
+            <small th:if="${post.commentCount > 0}"
+                   th:text="' [' + ${post.commentCount} + '] '"
+                   class="text-muted"></small>
+          </a>
+          <a th:unless="${condition.keyword != null}" th:href="|@{/posts/{id}(id=${post.id}, p=${currentPage + 1})}|">
             <strong th:if="${post.type.name() == 'NOTICE'}" th:text="${post.subject}"></strong>
             <span th:unless="${post.type.name() == 'NOTICE'}" th:text="${post.subject}"></span>
             <small th:if="${post.commentCount > 0}"
@@ -77,7 +84,7 @@
     </div>
     <div class="row">
       <div class="col-5 m-auto">
-        <form th:object="${condition}">
+        <form th:object="${condition}" th:action="@{/posts}">
           <div class="input-group">
             <div class="input-group-prepend">
               <select class="form-control" th:field="*{mode}">
