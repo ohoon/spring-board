@@ -89,40 +89,41 @@
       </tr>
       </thead>
       <tbody>
-      <tr th:each="post : ${posts}">
+      <tr th:each="p : ${posts}" th:style="${p.id == post.id ? 'background-color: rgba(0,0,0,.100);' : ''}">
         <td>
-          <small th:if="${post.type.name() == 'NOTICE'}" th:text="공지"></small>
-          <small th:unless="${post.type.name() == 'NOTICE'}" th:text="${post.id}"></small>
+          <small th:if="${p.id == post.id}" th:text="'>'"></small>
+          <small th:if="${p.id != post.id && p.type.name() == 'NOTICE'}" th:text="공지"></small>
+          <small th:if="${p.id != post.id && p.type.name() != 'NOTICE'}" th:text="${p.id}"></small>
         </td>
         <td style="text-align: left">
-          <a th:if="${condition.keyword != null}" th:href="|@{/posts/{id}(id=${post.id}, mode=${condition.mode}, keyword=${condition.keyword}, p=${currentPage + 1})}|">
-            <strong th:if="${post.type.name() == 'NOTICE'}" th:text="${post.subject}"></strong>
-            <span th:unless="${post.type.name() == 'NOTICE'}" th:text="${post.subject}"></span>
-            <small th:if="${post.commentCount > 0}"
-                   th:text="' [' + ${post.commentCount} + '] '"
+          <a th:if="${condition.keyword != null}" th:href="|@{/posts/{id}(id=${p.id}, mode=${condition.mode}, keyword=${condition.keyword}, p=${currentPage + 1})}|">
+            <strong th:if="${p.type.name() == 'NOTICE'}" th:text="${p.subject}"></strong>
+            <span th:unless="${p.type.name() == 'NOTICE'}" th:text="${p.subject}"></span>
+            <small th:if="${p.commentCount > 0}"
+                   th:text="' [' + ${p.commentCount} + '] '"
                    class="text-muted"></small>
           </a>
-          <a th:unless="${condition.keyword != null}" th:href="|@{/posts/{id}(id=${post.id}, p=${currentPage + 1})}|">
-            <strong th:if="${post.type.name() == 'NOTICE'}" th:text="${post.subject}"></strong>
-            <span th:unless="${post.type.name() == 'NOTICE'}" th:text="${post.subject}"></span>
-            <small th:if="${post.commentCount > 0}"
-                   th:text="' [' + ${post.commentCount} + '] '"
+          <a th:unless="${condition.keyword != null}" th:href="|@{/posts/{id}(id=${p.id}, p=${currentPage + 1})}|">
+            <strong th:if="${p.type.name() == 'NOTICE'}" th:text="${p.subject}"></strong>
+            <span th:unless="${p.type.name() == 'NOTICE'}" th:text="${p.subject}"></span>
+            <small th:if="${p.commentCount > 0}"
+                   th:text="' [' + ${p.commentCount} + '] '"
                    class="text-muted"></small>
           </a>
         </td>
-        <td th:text="${post.nickname}"></td>
+        <td th:text="${p.nickname}"></td>
         <td>
-          <small th:if="${post.createdDate.isAfter(post.createdDate.now().minusDays(1))}"
-                 th:text="${#temporals.format(post.createdDate, 'HH:mm')}"></small>
-          <small th:unless="${post.createdDate.isAfter(post.createdDate.now().minusDays(1))}"
-                 th:if="${post.createdDate.year == post.createdDate.now().year}"
-                 th:text="${#temporals.format(post.createdDate, 'MM.dd')}"></small>
-          <small th:unless="${post.createdDate.isAfter(post.createdDate.now().minusDays(1)) ||
-           post.createdDate.year == post.createdDate.now().year}"
-                 th:text="${#temporals.format(post.createdDate, 'yyyy/MM/dd')}"></small>
+          <small th:if="${p.createdDate.isAfter(p.createdDate.now().minusDays(1))}"
+                 th:text="${#temporals.format(p.createdDate, 'HH:mm')}"></small>
+          <small th:unless="${p.createdDate.isAfter(p.createdDate.now().minusDays(1))}"
+                 th:if="${p.createdDate.year == p.createdDate.now().year}"
+                 th:text="${#temporals.format(p.createdDate, 'MM.dd')}"></small>
+          <small th:unless="${p.createdDate.isAfter(p.createdDate.now().minusDays(1)) ||
+           p.createdDate.year == p.createdDate.now().year}"
+                 th:text="${#temporals.format(p.createdDate, 'yyyy/MM/dd')}"></small>
         </td>
-        <td><small th:text="${post.hit}"></small></td>
-        <td><small th:text="${post.like}"></small></td>
+        <td><small th:text="${p.hit}"></small></td>
+        <td><small th:text="${p.like}"></small></td>
       </tr>
       <tr th:if="${posts.isEmpty()}">
         <td colspan="5" class="text-center">게시물이 없습니다.</td>
@@ -163,11 +164,10 @@
     <div th:replace="/fragments/footer :: footer"></div>
   </div>
   <script th:inline="javascript">
-    /*<![CDATA[*/
     const postId = [[${post.id}]];
     const memberId = [[${member == null ? null : member.id}]];
     const commentPageNumber = [[${commentPageNumber}]];
-    /*]]>*/
+
     $(document).ready(() => {
       readComments(commentPageNumber);
     });
@@ -242,9 +242,7 @@
     function readComments(page) {
       const list = $('#comment_list');
       const cmtCount = $('#comment_count');
-      /*<![CDATA[*/
-        const username = [[${member == null ? null : member.username}]];
-        /*]]>*/
+      const username = [[${member == null ? null : member.username}]];
 
       $.ajax({
         type:"GET",
