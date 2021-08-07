@@ -72,6 +72,8 @@ public class PostController {
             @CurrentMember Member member,
             @PathVariable("id") Long postId,
             @RequestParam(name = "cp", defaultValue = "1") Long commentPageNumber,
+            @ModelAttribute("condition") PostSearchCondition condition,
+            @PageableDefault Pageable pageable,
             Model model
     ) {
         Post post = postService.read(postId);
@@ -79,6 +81,12 @@ public class PostController {
         model.addAttribute("member", member);
         model.addAttribute("post", post);
         model.addAttribute("commentPageNumber", commentPageNumber);
+
+        Page<Post> posts = postService.search(condition, pageable);
+        Page<PostListDto> postPage = posts.map(PostListDto::new);
+        model.addAttribute("posts", postPage.getContent());
+        model.addAttribute("currentPage", postPage.getNumber());
+        model.addAttribute("totalPages", postPage.getTotalPages());
         return "posts/read";
     }
 
